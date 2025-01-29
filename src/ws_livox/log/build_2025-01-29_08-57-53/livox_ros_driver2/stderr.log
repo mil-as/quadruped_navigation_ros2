@@ -1,0 +1,6 @@
+[0m** WARNING ** io features related to pcap will be disabled[0m
+[31mCMake Error at CMakeLists.txt:249 (find_library):
+  Could not find LIVOX_LIDAR_SDK_LIBRARY using the following names:
+  liblivox_lidar_sdk_shared.so, /usr/local/lib
+
+[0m
