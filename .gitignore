@@ -53,3 +53,6 @@ CATKIN_IGNORE
 ######
 .vscode
 /isaac_ros_common
+/spot_ros2
+/install
+/log
