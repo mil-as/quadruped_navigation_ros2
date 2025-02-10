@@ -24,11 +24,15 @@ git clone https://github.com/bdaiinstitute/spot_ros2.git
 ```
 
 Then run this script to install the required pip packages and uninstall "protoc" and "libprotobuf":
+
+For x86_64:
 ```bash
 cd ${ISAAC_ROS_WS}
-
 sudo ./spot_setup.sh
-or
+```
+Or for arm64:
+```bash
+cd ${ISAAC_ROS_WS}
 sudo ./spot_setup.sh --arm64
 ```
 
