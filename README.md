@@ -30,6 +30,13 @@ To set up the developer environment setup follow this official guide:
 
 https://nvidia-isaac-ros.github.io/getting_started/dev_env_setup.html
 
+Then move .isaac_ros_common-config to the home directory
+
+```bash
+cd ${ISAAC_ROS_WS} && \
+mv .isaac_ros_common-config ~/.isaac_ros_common-config
+```
+
 ## Isaac ROS Dev Container
 
 To start, clone "Isaac_ros_common" to the /src folder:

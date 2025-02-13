@@ -1,0 +1,2 @@
+CONFIG_IMAGE_KEY="ros2_humble.mine"
+CONFIG_DOCKER_SEARCH_DIRS=(/mnt/nova_ssd/workspaces/isaac_ros-dev)
