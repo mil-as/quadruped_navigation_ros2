@@ -38,7 +38,11 @@ def generate_launch_description():
         executable='livox_ros_driver2_node',
         name='livox_lidar_publisher',
         output='screen',
-        parameters=livox_ros2_params
+        parameters=livox_ros2_params,
+
+        remappings=[
+            (f'/livox/lidar', '/pointcloud'),
+        ]
         )
 
     return LaunchDescription([
