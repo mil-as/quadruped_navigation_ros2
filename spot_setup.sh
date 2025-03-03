@@ -27,7 +27,7 @@ rm -f /usr/local/lib/libprotobuf-lite.so
 # Update links for the libraries
 ldconfig
 
-# Initialices and updated the spot_ros2 submodul
+# Initialize and update the spot_ros2 submodule
 cd /workspaces/isaac_ros-dev/src/spot_ros2
 git submodule init
 git submodule update
@@ -41,8 +41,13 @@ while [ : ]; do
             break
             ;;
         *)
-            echo "Test_2"
-            ./install_spot_ros2.sh
+            echo "Executing "install_spot_ros2.sh""
+            ./install_spot_ros2.sh 
+            #Installs packages that are missing for x86 for bosdyn
+            pip install bosdyn-client \
+    	    bosdyn-mission \
+            bosdyn-choreography-protos \
+            bosdyn-choreography-client 
             break
             ;;
     esac
