@@ -56,3 +56,4 @@ CATKIN_IGNORE
 /spot_ros2
 /install
 /log
+spot_config.yaml
