@@ -1,0 +1,46 @@
+/**:
+  ros__parameters:
+    # Spot Login Information
+    username: "user"
+    password: "password"
+    hostname: "10.0.0.3"
+
+    # Status Updates from Spot
+    metrics_rate: 0.04
+    lease_rate: 1.0
+    async_tasks_rate: 10.0
+
+    # Some boolean parameters
+    auto_claim: False
+    auto_power_on: False
+    auto_stand: False
+
+    # Estop Parameters
+    estop_timeout: 9.0
+    start_estop: False
+
+    preferred_odom_frame: "odom" # pass either odom/vision. This will be used in the odometry topic. https://dev.bostondynamics.com/docs/concepts/geometry_and_frames.html?highlight=frame#frames-in-the-spot-robot-world for more info.
+    tf_root: "odom" # Use "odom" (default), "vision", or "body" for the root frame in your TF tree.
+
+    cmd_duration: 0.25 # The duration of cmd_vel commands. Increase this if spot stutters when publishing cmd_vel.
+    rgb_cameras: False  # Set to False if your robot has greyscale cameras -- otherwise you won't receive data.
+    initialize_spot_cam: False # Set to True if you are connecting to a SpotCam payload module.
+
+    # You can uncomment and edit the list below if you only want to publish data from a certain set of cameras.
+    # cameras_used: ["frontleft", "frontright", "left", "right", "back", "hand"]
+
+    # The following parameters are used in the image stitcher node and were determined through a lot of manual tuning.
+    # They can be adjusted if the stitched image looks incorrect on your robot.
+
+    # Virtual camera intrinsic matrix [fx, 0, cx, 0, fy, cy, 0, 0, 1]
+    # fx stretches the image left-right, fy zooms in, cx moves the image left-right, cy moves the image up-down.
+    virtual_camera_intrinsics: [385.0, 0.0, 315.0, 0.0, 385.0, 844.0, 0.0, 0.0, 1.0]
+    # Plane that the stitched image is projected on with respect to the virtual camera frame. 
+    virtual_camera_projection_plane: [-0.15916, 0.0, 0.987253]
+    # The distance from the virtual camera frame to the projection plane
+    virtual_camera_plane_distance: 0.5
+    # The stitched image will be of size (<frontleft image width>, <frontleft image height> + row_padding)
+    stitched_image_row_padding: 1182
+
+    # Change to True if missing gripper on arm
+    gripperless: False
