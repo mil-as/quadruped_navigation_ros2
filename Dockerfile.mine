@@ -5,7 +5,7 @@ FROM ${BASE_IMAGE}
 # RUN mkdir -p /opt/hpcx/ompi/lib/x86_64-linux-gnu
 # RUN ln -s /opt/hpcx/ompi /opt/hpcx/ompi/lib/x86_64-linux-gnu/openmpi
 
-# Installs packedes
+# Installs packages
 RUN apt-get install -y ros-humble-pcl-conversions
 
 # Builds Livox SDK2
