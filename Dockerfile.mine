@@ -1,7 +1,7 @@
-ARG BASE_IMAGE="ubuntu:22.04"
+ARG BASE_IMAGE="scratch"
 FROM ${BASE_IMAGE}
 
-# Installs packedes
+# Installs packages
 RUN apt-get install -y ros-humble-pcl-conversions
 
 # Builds Livox SDK2
