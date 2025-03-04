@@ -48,6 +48,12 @@ cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
 
 To open a new terminal in the same container, run the same command.
 
+## Foxglove
+To start the ROS "Foxglove bridge":
+```bash
+ros2 launch foxglove_bridge foxglove_bridge_launch.xml
+```
+
 ## Livox MID360 setup
 
 Clone the Livox MID360 repository to the /src folder:
