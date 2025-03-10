@@ -15,8 +15,6 @@ apt-get install -y --reinstall libprotobuf-lite23
 # Install the `proto2ros` package for ROS2
 apt-get -y install ros-humble-proto2ros
 
-
-
 # Update shell cache
 hash -r
 
@@ -55,4 +53,5 @@ while [ : ]; do
     esac
 done
 
+# Install setuptools 61.0.0 to be able to build the package
 pip install setuptools==61.0.0
