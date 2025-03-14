@@ -1,6 +1,10 @@
 ARG BASE_IMAGE="scratch"
 FROM ${BASE_IMAGE}
 
+# Uncomment for x86
+# RUN mkdir -p /opt/hpcx/ompi/lib/x86_64-linux-gnu
+# RUN ln -s /opt/hpcx/ompi /opt/hpcx/ompi/lib/x86_64-linux-gnu/openmpi
+
 # Installs packages
 RUN apt-get install -y ros-humble-pcl-conversions
 

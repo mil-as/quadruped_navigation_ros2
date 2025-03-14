@@ -75,3 +75,13 @@ To build with the livox_ros_driver, the "ROS_EDITION" and "HUMBLE_ROS" need to b
 ```bash
 colcon build --symlink-install --cmake-args -DROS_EDITION=ROS2 -DHUMBLE_ROS=humble
 ```
+
+## Pointcloud to laserscan
+Clone the humble branch to /src:
+
+```bash
+cd ${ISAAC_ROS_WS}/src
+git clone -b humble --single-branch https://github.com/ros-perception/pointcloud_to_laserscan.git
+```
+
+Build using the same command as for Livox
