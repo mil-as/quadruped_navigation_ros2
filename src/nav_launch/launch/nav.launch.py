@@ -10,7 +10,7 @@ from launch_ros.substitutions import FindPackageShare
 def generate_launch_description():
     package_name = 'nav_launch'
 
-    glim_config_path = os.path.realpath(os.path.expanduser('~/config'))
+    glim_config_path = "/workspaces/isaac_ros-dev/src/nav_launch/config/"
     slam_toolbox_path = os.path.join(get_package_share_directory(package_name), 'mapper_params_online_async.yaml')
     glim_node = Node(
         package='glim_ros',

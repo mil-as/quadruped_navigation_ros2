@@ -1,7 +1,7 @@
 {
   /*** Global Configuration ***/
   "global": {
-    "config_path": "/workspaces/isaac_ros-dev/src/nav_launch/config",
+    "config_path": "",
     "config_ros": "config_ros.json",
     "config_viewer": "config_viewer.json",
     "config_sensors": "config_sensors.json",
