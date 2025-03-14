@@ -56,7 +56,7 @@
     ],
     // Topics
     "imu_topic": "/livox/imu" , ///zed/zed_node/imu/data
-    "points_topic": "/merged_cloud",
+    "points_topic": "/livox/lidar",
     "image_topic": "/image"
   }
 }
