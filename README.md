@@ -2,6 +2,7 @@
 
 BSc 2025 Project
 
+<<<<<<< HEAD
 
 ## Requirements
 
@@ -34,17 +35,27 @@ https://nvidia-isaac-ros.github.io/getting_started/dev_env_setup.html
 
 To start, clone "Isaac_ros_common" to the /src folder:
 
+=======
+## Isaac ROS Dev Container
+
+To start, clone "Isaac_ros_common" to the /src folder:
+>>>>>>> spot_sim
 ```bash
 cd ${ISAAC_ROS_WS}/src && \
 git clone -b release-3.2 https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common.git isaac_ros_common
 ```
+<<<<<<< HEAD
 
 To start the container, run:
 
+=======
+To start the container, run:
+>>>>>>> spot_sim
 ```bash
 cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
 ./scripts/run_dev.sh
 ```
+<<<<<<< HEAD
 
 To open a new terminal in the same container, run the same command.
 
@@ -85,3 +96,33 @@ git clone -b humble --single-branch https://github.com/ros-perception/pointcloud
 ```
 
 Build using the same command as for Livox
+=======
+To open a new terminal in the same container, run the same command.
+
+## Spot setup
+
+In the src folder, clone the spot_ros2 repository:
+```bash
+cd ${ISAAC_ROS_WS}/src
+git clone https://github.com/bdaiinstitute/spot_ros2.git
+```
+
+Then run this script to install the required pip packages and uninstall "protoc" and "libprotobuf":
+
+For x86_64:
+```bash
+cd ${ISAAC_ROS_WS}
+sudo ./spot_setup.sh
+```
+Or for arm64:
+```bash
+cd ${ISAAC_ROS_WS}
+sudo ./spot_setup.sh --arm64
+```
+
+To build the package, use:
+```bash
+cd ${ISAAC_ROS_WS}
+colcon build --symlink-install --cmake-args -DBUILD_TESTING=OFF
+```
+>>>>>>> spot_sim
