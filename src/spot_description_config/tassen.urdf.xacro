@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:if value="$(optenv TASSEN 1)">
+    <joint name="tassen_joint" type="fixed">
+      <parent link="front_rail"/>
+      <child link="tassen"/>
+      <origin xyz="-0.035 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <link name="tassen">
+      <visual>
+        <geometry>
+          <mesh filename="package://spot_description/meshes/tassen/Tassen.obj" scale="0.01 0.01 0.01"/>
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <mesh filename="package://spot_description/meshes/tassen/TassenProtect.obj" scale="0.01 0.01 0.01"/>
+        </geometry>
+      </collision>
+    </link>
+    
+    <joint name="ZED_mount_joint" type="fixed">
+      <parent link="tassen"/>
+      <child link="ZED_camera"/>
+      <origin xyz="0.06175 0 0.08525" rpy="0 0 0"/>
+    </joint>
+
+    <link name="ZED_camera">
+      <visual>
+        <geometry>
+          <mesh filename="package://spot_description/meshes/ZED/ZED.obj" scale="0.01 0.01 0.01"/>
+        </geometry>
+      </visual>
+    </link>
+    
+     <joint name="LIVOX_mount_joint" type="fixed">
+      <parent link="tassen"/>
+      <child link="LIVOX_lidar"/>
+      <origin xyz="0 0 0.11925" rpy="0 0 0"/>
+    </joint>
+
+    <link name="LIVOX_lidar">
+      <visual>
+        <geometry>
+          <mesh filename="package://spot_description/meshes/LIVOX/LIVOX.obj" scale="0.01 0.01 0.01"/>
+        </geometry>
+      </visual>
+    </link>
+    
+  </xacro:if>
+</robot>
+
+
