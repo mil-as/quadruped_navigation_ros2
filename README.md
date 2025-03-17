@@ -2,7 +2,6 @@
 
 BSc 2025 Project
 
-<<<<<<< HEAD
 
 ## Requirements
 
@@ -35,27 +34,17 @@ https://nvidia-isaac-ros.github.io/getting_started/dev_env_setup.html
 
 To start, clone "Isaac_ros_common" to the /src folder:
 
-=======
-## Isaac ROS Dev Container
-
-To start, clone "Isaac_ros_common" to the /src folder:
->>>>>>> spot_sim
 ```bash
 cd ${ISAAC_ROS_WS}/src && \
 git clone -b release-3.2 https://github.com/NVIDIA-ISAAC-ROS/isaac_ros_common.git isaac_ros_common
 ```
-<<<<<<< HEAD
 
 To start the container, run:
 
-=======
-To start the container, run:
->>>>>>> spot_sim
 ```bash
 cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
 ./scripts/run_dev.sh
 ```
-<<<<<<< HEAD
 
 To open a new terminal in the same container, run the same command.
 
@@ -81,12 +70,6 @@ cd ${ISAAC_ROS_WS}
 ./MID360_setup.sh
 ```
 
-To build with the livox_ros_driver, the "ROS_EDITION" and "HUMBLE_ROS" need to be specified:
-
-```bash
-colcon build --symlink-install --cmake-args -DROS_EDITION=ROS2 -DHUMBLE_ROS=humble
-```
-
 ## Pointcloud to laserscan
 Clone the humble branch to /src:
 
@@ -95,9 +78,12 @@ cd ${ISAAC_ROS_WS}/src
 git clone -b humble --single-branch https://github.com/ros-perception/pointcloud_to_laserscan.git
 ```
 
-Build using the same command as for Livox
-=======
-To open a new terminal in the same container, run the same command.
+## GLIM
+To install GLIM
+
+```bash
+./nav2_glim_setup.sh
+```
 
 ## Spot setup
 
@@ -119,10 +105,18 @@ Or for arm64:
 cd ${ISAAC_ROS_WS}
 sudo ./spot_setup.sh --arm64
 ```
+## Build packages
 
 To build the package, use:
 ```bash
 cd ${ISAAC_ROS_WS}
-colcon build --symlink-install --cmake-args -DBUILD_TESTING=OFF
+colcon build --symlink-install --cmake-args -DBUILD_TESTING=OFF -DROS_EDITION=ROS2 -DHUMBLE_ROS=humble
 ```
->>>>>>> spot_sim
+## Launch steps
+
+In container 1 run
+
+```bash
+source instal/setup.bash
+
+```
