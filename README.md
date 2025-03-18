@@ -114,9 +114,21 @@ colcon build --symlink-install --cmake-args -DBUILD_TESTING=OFF -DROS_EDITION=RO
 ```
 ## Launch steps
 
-In container 1 run
+In terminal 1 run (Slam_toolbox, Glim and Pointcloud_to_laserscan):
 
 ```bash
-source instal/setup.bash
-
+ros2 launch nav_launch nav.launch.py 
 ```
+In terminal 2 run (nav2 navigation):
+
+```bash
+ros2 launch nav2_bringup navigation_launch.py params_file:=/workspaces/isaac_ros-dev/src/nav_launch/config/nav2_params.yaml 
+```
+
+In terminal 3 run (Spot drivers):
+
+```bash
+ ros2 launch spot_driver spot_driver.launch.py config_file:=src/spot_config.yaml 
+```
+
+
