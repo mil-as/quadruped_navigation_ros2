@@ -19,4 +19,7 @@ sudo apt install -y libiridescence-dev ros-humble-glim-ros-cuda12.5
 sudo ldconfig
 
 
+sudo apt-get install ros-humble-nav2-smac-planner
+
+
 
