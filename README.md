@@ -34,7 +34,7 @@ Then move .isaac_ros_common-config to the home directory
 
 ```bash
 cd ${ISAAC_ROS_WS} && \
-mv .isaac_ros_common-config ~/.isaac_ros_common-config
+cp .isaac_ros_common-config ~/.isaac_ros_common-config
 ```
 
 ## Isaac ROS Dev Container
