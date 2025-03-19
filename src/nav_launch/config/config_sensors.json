@@ -60,7 +60,7 @@
     // LiDAR per-point time settings
     "autoconf_perpoint_times": true,
     "autoconf_prefer_frame_time": false,
-    "perpoint_relative_time": true,
+    "perpoint_relative_time": false,
     "perpoint_time_scale": 1.0,
     // Camera config (required for only extension modules)
     "global_shutter_camera": true,
