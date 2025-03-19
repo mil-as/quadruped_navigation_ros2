@@ -553,11 +553,10 @@
         <xacro:include filename="$(find spot_description)/urdf/accessories.urdf.xacro" />
         
        <!-- Tassen -->
-        
         <xacro:include filename="$(find spot_description)/urdf/tassen.urdf.xacro" />
+        <xacro:use_tassen tf_prefix="${tf_prefix}" />
 
         <!-- Optional custom includes. -->
-
         <xacro:property name="default_empty_urdf" value="$(find spot_description)/urdf/empty.urdf" />
         <xacro:include filename="$(optenv SPOT_URDF_EXTRAS ${default_empty_urdf})" />
 
