@@ -155,7 +155,7 @@ typedef struct {
   float reflectivity; /**< Reflectivity   */
   // uint8_t tag;        /**< Livox point tag   */
   // uint8_t line;       /**< Laser line id     */
-  // double timestamp;   /**< Timestamp of point*/
+  double timestamp;   /**< Timestamp of point*/
 } LivoxPointXyzrtlt;
 
 typedef struct {
