@@ -70,6 +70,25 @@ cd ${ISAAC_ROS_WS}
 ./MID360_setup.sh
 ```
 
+
+## ZED2i setup
+Clone the ZED2i repository to the /src folder:
+
+```bash
+cd ${ISAAC_ROS_WS}/src
+git clone --recurse-submodules https://github.com/stereolabs/zed-ros2-wrapper
+```
+
+Then run zed_setup.sh to run make zed script executable and to run the script (--arm64 for arm based platform):
+
+```bash
+cd ${ISAAC_ROS_WS}
+./zed_setup.sh
+```
+
+
+
+
 ## Pointcloud to laserscan
 Clone the humble branch to /src:
 
