@@ -63,7 +63,7 @@
       <joint name="${tf_prefix}zed_camera" type="fixed">
         <parent link="${tf_prefix}zed_camera"/>
         <child link="zed_camera_link"/>
-        <origin xyz="0 0 0.047" rpy="0 0 0"/>
+        <origin xyz="0 0 0.01" rpy="0 0 0"/>
       </joint>
 
       <link name="zed_camera_link"/>
