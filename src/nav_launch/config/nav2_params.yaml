@@ -6,7 +6,7 @@ amcl:
     alpha3: 0.2
     alpha4: 0.2
     alpha5: 0.2
-    base_frame_id: "livox_frame" #base_footprint
+    base_frame_id: "body" #base_footprint
     beam_skip_distance: 0.5
     beam_skip_error_threshold: 0.9
     beam_skip_threshold: 0.3
@@ -43,7 +43,7 @@ bt_navigator:
   ros__parameters:
     use_sim_time: False
     global_frame: map
-    robot_base_frame: livox_frame #base_link
+    robot_base_frame: body #base_link
     odom_topic: /odom_glim
     bt_loop_duration: 10
     default_server_timeout: 20
@@ -186,7 +186,7 @@ local_costmap:
       update_frequency: 5.0
       publish_frequency: 2.0
       global_frame: map
-      robot_base_frame: livox_frame #base_link
+      robot_base_frame: body #base_link
       use_sim_time: False
       rolling_window: true
       width: 5
@@ -207,19 +207,9 @@ local_costmap:
         z_voxels: 16
         max_obstacle_height: 2.0
         mark_threshold: 0
-        observation_sources: scan pointcloud
-        scan:
-          topic: /scan
-          max_obstacle_height: 2.0
-          clearing: True
-          marking: True
-          data_type: "LaserScan"
-          raytrace_max_range: 3.0
-          raytrace_min_range: 0.0
-          obstacle_max_range: 2.5
-          obstacle_min_range: 0.0
+        observation_sources: pointcloud
         pointcloud:
-          topic: /livox/lidar
+          topic: /glim_ros/aligned_points
           max_obstacle_height: 5.0
           clearing: True
           marking: True
@@ -239,7 +229,7 @@ global_costmap:
       update_frequency: 1.0
       publish_frequency: 1.0
       global_frame: map
-      robot_base_frame: livox_frame #base_link
+      robot_base_frame: body #base_link
       use_sim_time: False
       footprint: '[ [0.30, 0.30], [-0.8, 0.30], [-0.8, -0.30], [0.30, -0.30] ]'
       resolution: 0.05
@@ -273,7 +263,8 @@ map_server:
     use_sim_time: False
     # Overridden in launch by the "map" launch configuration or provided default value.
     # To use in yaml, remove the default "map" value in the tb3_simulation_launch.py file & provide full path to map below.
-    yaml_filename: ""
+    yaml_filename: "/workspaces/isaac_ros-dev/kart.yaml"
+
 
 map_saver:
   ros__parameters:
@@ -321,7 +312,7 @@ behavior_server:
     assisted_teleop:
       plugin: "nav2_behaviors/AssistedTeleop"
     global_frame: odom_glim
-    robot_base_frame: livox_frame #base_link
+    robot_base_frame: body #base_link
     transform_tolerance: 0.1
     use_sim_time: false
     simulate_ahead_time: 2.0

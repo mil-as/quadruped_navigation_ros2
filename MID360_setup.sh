@@ -26,8 +26,8 @@ cp livox_config_launch/MID360_config.json livox_ros_driver2/config/MID360_config
 cp livox_config_launch/msg_MID360_launch.py livox_ros_driver2/launch_ROS2/msg_MID360_launch.py
 
 # Edited files to just send x, y, z and intensity with pointcloud2
-cp livox_config_launch/comm.h livox_ros_driver2/src/comm/comm.h
-cp livox_config_launch/lddc.cpp livox_ros_driver2/src/lddc.cpp
+#cp livox_config_launch/comm.h livox_ros_driver2/src/comm/comm.h
+#cp livox_config_launch/lddc.cpp livox_ros_driver2/src/lddc.cpp
 
 # Create the package.xml file
 cp -f livox_ros_driver2/package_ROS2.xml livox_ros_driver2/package.xml

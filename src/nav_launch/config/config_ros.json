@@ -42,7 +42,7 @@
     // TF config
     "imu_frame_id": "livox_frame", //zed_imu_link
     "lidar_frame_id": "livox_frame_noe",  
-    "base_frame_id":"tassen/body" ,
+    "base_frame_id":"body" ,
     "odom_frame_id": "odom_glim",
     "map_frame_id": "map",
     "publish_imu2lidar": false,
