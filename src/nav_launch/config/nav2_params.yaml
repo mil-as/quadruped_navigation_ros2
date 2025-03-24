@@ -209,7 +209,7 @@ local_costmap:
         mark_threshold: 0
         observation_sources: pointcloud
         pointcloud:
-          topic: /glim_ros/aligned_points
+          topic: /zed/zed_node/point_cloud/cloud_registered
           max_obstacle_height: 5.0
           clearing: True
           marking: True
