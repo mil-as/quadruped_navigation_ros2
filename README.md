@@ -117,7 +117,8 @@ cd ${ISAAC_ROS_WS}/src
 git clone https://github.com/bdaiinstitute/spot_ros2.git
 ```
 
-Then run this script to install the required pip packages and uninstall "protoc" and "libprotobuf":
+Then run this script to install the required pip packages and uninstall "protoc" and "libprotobuf".
+It also moves the updated urdf files from spot_description_config to spot_ros2 folders.
 
 For x86_64:
 ```bash
