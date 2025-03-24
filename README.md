@@ -79,13 +79,18 @@ cd ${ISAAC_ROS_WS}/src
 git clone --recurse-submodules https://github.com/stereolabs/zed-ros2-wrapper
 ```
 
-Then run zed_setup.sh to run make zed script executable and to run the script (--arm64 for arm based platform):
+Then run zed_setup.sh to make zed script executable and to run the script:
 
+For x86_64:
 ```bash
 cd ${ISAAC_ROS_WS}
 ./zed_setup.sh
 ```
-
+Or for arm64:
+```bash
+cd ${ISAAC_ROS_WS}
+./zed_setup.sh --arm64
+```
 
 
 
