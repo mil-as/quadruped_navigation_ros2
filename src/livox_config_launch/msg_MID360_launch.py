@@ -40,9 +40,9 @@ def generate_launch_description():
         output='screen',
         parameters=livox_ros2_params,
 
-        remappings=[
-            (f'/livox/lidar', '/pointcloud'),
-        ]
+        #        remappings=[
+        #    (f'/livox/lidar', '/pointcloud'),
+        #]
         )
 
     return LaunchDescription([
