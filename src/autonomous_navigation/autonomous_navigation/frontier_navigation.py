@@ -116,7 +116,7 @@ class ExplorerNode(Node):
             if distance < min_distance:
                 min_distance, chosen_frontier = distance, center
 
-        if chosen_frontier:
+        if chosen_frontier is not None:
             self.visited_frontiers.add(tuple(chosen_frontier))
             self.get_logger().info(f"Chosen frontier center: {chosen_frontier}")
         else:
@@ -173,7 +173,7 @@ class ExplorerNode(Node):
             return
 
         chosen_frontier = self.choose_frontier(frontiers)
-        if not chosen_frontier:
+        if chosen_frontier is None:
             self.get_logger().warning("No frontiers to explore")
             return
 
