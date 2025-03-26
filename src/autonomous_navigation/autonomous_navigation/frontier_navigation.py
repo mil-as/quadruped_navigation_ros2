@@ -1,7 +1,8 @@
+#! /usr/bin/env python3
+
 import rclpy
 from rclpy.node import Node
 import numpy as np
-from scipy.ndimage import label
 from geometry_msgs.msg import PoseStamped, Twist
 from nav_msgs.msg import OccupancyGrid
 from nav2_msgs.action import NavigateToPose
@@ -28,8 +29,32 @@ class ExplorerNode(Node):
         # Minimum length for frontiers
         self.frontier_min_length = 3  # Default value: adjust as needed
 
-        # Perform initial search
         self.initial_search()
+
+    def map_callback(self, msg):
+        """Callback to process the map data."""
+        self.map_data = msg
+        self.get_logger().info("Map received")
+
+    def initial_search(self):
+        """
+        Perform initial rotation to scan the surroundings 360 degrees.
+        """
+        self.get_logger().info("Conducting initial 360 degree rotation search")
+
+        rotate_msg = Twist()
+        rotate_msg.angular.z = 0.5  # Adjust the angular speed (rad/s) as necessary
+
+        duration = 6.28 / rotate_msg.angular.z  # Assuming full rotation (2*PI radians)
+        end_time = self.get_clock().now().seconds_nanoseconds()[0] + duration
+
+        while self.get_clock().now().seconds_nanoseconds()[0] < end_time:
+            self.cmd_vel_pub.publish(rotate_msg)
+
+        # Stop rotation
+        stop_msg = Twist()
+        self.cmd_vel_pub.publish(stop_msg)
+        self.get_logger().info("Completed initial rotation")
 
     def find_frontiers(self, map_array):
         """Detect frontiers of any shape between wall cells in the occupancy grid map."""
@@ -52,11 +77,11 @@ class ExplorerNode(Node):
             while queue:
                 r, c = queue.pop(0)
 
-                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:  # Up, Down, Left, Right
+                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                     nr, nc = r + dr, c + dc
 
                     if is_valid_cell(nr, nc) and not visited[nr, nc]:
-                        if map_array[nr, nc] == -1:  # Unknown cell
+                        if map_array[nr, nc] == -1:
                             queue.append((nr, nc))
                             visited[nr, nc] = True
                             frontier.append((nr, nc))
@@ -71,7 +96,6 @@ class ExplorerNode(Node):
                 if map_array[r, c] == -1 and not visited[r, c]:
                     frontier, wall_contacts = bfs_find_frontier(r, c)
 
-                    # Frontier is valid if it is bounded by at least two different walls
                     if len(wall_contacts) >= 2 and len(frontier) >= self.frontier_min_length:
                         frontiers.append(frontier)
 
