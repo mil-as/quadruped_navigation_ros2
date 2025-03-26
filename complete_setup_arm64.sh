@@ -2,7 +2,7 @@
 
 ./nav2_glim_setup.sh
 ./zed_setup.sh --arm64
-./spot_setup.sh --arm64
+sudo ./spot_setup.sh --arm64
 
 rm -r install/ build/ log/
 
