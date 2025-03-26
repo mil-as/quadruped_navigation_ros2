@@ -28,7 +28,7 @@ class ExplorerNode(Node):
         self.create_timer(5.0, self.explore)
 
         # Minimum length for frontiers
-        self.frontier_min_length = 3  # Default value: adjust as needed
+        self.frontier_min_length = 22  # Default value: adjust as needed
 
         self.initial_search()
 
@@ -50,7 +50,7 @@ class ExplorerNode(Node):
         rotate_msg = Twist()
         rotate_msg.angular.z = 0.5  # Adjust the angular speed (rad/s) as necessary
 
-        duration = 6.28 / rotate_msg.angular.z  # Assuming a full rotation (2*PI radians)
+        duration = 3.14*3 / rotate_msg.angular.z  # Assuming a full rotation (2*PI radians)
         end_time = self.get_clock().now().seconds_nanoseconds()[0] + duration
 
         while self.get_clock().now().seconds_nanoseconds()[0] < end_time:
