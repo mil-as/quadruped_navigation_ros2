@@ -24,6 +24,7 @@ class ExplorerNode(Node):
         self.visited_frontiers = set()
         self.map_data = None
         self.robot_position = (0, 0)  # Update from localization
+        self.start_position = None
         self.create_timer(5.0, self.explore)
 
         # Minimum length for frontiers
@@ -39,13 +40,17 @@ class ExplorerNode(Node):
     def initial_search(self):
         """
         Perform initial rotation to scan the surroundings 360 degrees.
+        Capture the starting position before rotation.
         """
+        self.start_position = self.robot_position  # Assume robot position can be initialized here
+        self.get_logger().info(f"Starting position recorded as: {self.start_position}")
+
         self.get_logger().info("Conducting initial 360 degree rotation search")
 
         rotate_msg = Twist()
         rotate_msg.angular.z = 0.5  # Adjust the angular speed (rad/s) as necessary
 
-        duration = 6.28 / rotate_msg.angular.z  # Assuming full rotation (2*PI radians)
+        duration = 6.28 / rotate_msg.angular.z  # Assuming a full rotation (2*PI radians)
         end_time = self.get_clock().now().seconds_nanoseconds()[0] + duration
 
         while self.get_clock().now().seconds_nanoseconds()[0] < end_time:
@@ -159,6 +164,22 @@ class ExplorerNode(Node):
         except Exception as e:
             self.get_logger().error(f"Navigation failed: {e}")
 
+    def return_to_home(self):
+        """Navigate back to start position and shut down"""
+        self.get_logger().info("Returning to start position...")
+        
+        if self.start_position is None:
+            self.get_logger().error("Start position is not recorded!")
+            return
+        
+        goal_x = self.start_position[1] * self.map_data.info.resolution + self.map_data.info.origin.position.x
+        goal_y = self.start_position[0] * self.map_data.info.resolution + self.map_data.info.origin.position.y
+        self.navigate_to(goal_x, goal_y)
+
+        # Shut down after reaching home
+        self.get_logger().info("Reached start position, shutting down.")
+        rclpy.shutdown()
+
     def explore(self):
         """Periodic exploration logic."""
         if self.map_data is None:
@@ -170,11 +191,13 @@ class ExplorerNode(Node):
 
         if not frontiers:
             self.get_logger().info("No frontiers found. Exploration complete!")
+            self.return_to_home()
             return
 
         chosen_frontier = self.choose_frontier(frontiers)
         if chosen_frontier is None:
             self.get_logger().warning("No frontiers to explore")
+            self.return_to_home()
             return
 
         goal_x = chosen_frontier[1] * self.map_data.info.resolution + self.map_data.info.origin.position.x
