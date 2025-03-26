@@ -20,11 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-        'costmap_to_image = autonomous_navigation.costmap_to_image:main',
-        'costmap_viz = autonomous_navigation.costmap_viz:main',
-        'costmap_testing = autonomous_navigation.costmap_testing:main',
-        'frontierExploration = autonomous_exploration.frontier_exploration:main',
-        'frontierExplorationTwo = autonomous_navigation.forntier_navigation2:main'
+        'frontierExploration = autonomous_navigation.frontier_navigation:main'
         ],
     },
 )
