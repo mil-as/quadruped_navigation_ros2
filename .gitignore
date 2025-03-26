@@ -56,3 +56,9 @@ CATKIN_IGNORE
 /spot_ros2
 /install
 /log
+
+####
+
+__pycache__/
+
+
