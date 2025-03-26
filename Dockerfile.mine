@@ -20,3 +20,5 @@ RUN git clone https://github.com/Livox-SDK/Livox-SDK2.git \
 
 # Sets the environment variable for DDS
 ENV RMW_IMPLEMENTATION=rmw_zenoh_cpp
+ENV ZENOH_ROUTER_CONFIG_URI=/workspaces/isaac_ros-dev/ZENOH_ROUTER_CONFIG.json5
+
