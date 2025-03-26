@@ -169,7 +169,7 @@ controller_server:
       short_circuit_trajectory_evaluation: True
       stateful: True
       critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
-      BaseObstacle.scale: 0.5 #0.02
+      BaseObstacle.scale: 0.02
       PathAlign.scale: 32.0
       PathAlign.forward_point_distance: 0.1
       GoalAlign.scale: 24.0
@@ -192,12 +192,12 @@ local_costmap:
       width: 5
       height: 5
       resolution: 0.05
-      footprint: '[ [0.40, 0.40], [-0.7, 0.40], [-0.7, -0.40], [0.40, -0.40] ]'
+      footprint: '[ [0.50, 0.30], [-0.70, 0.30], [-0.70, -0.30], [0.50, -0.30] ]'
       plugins: ["voxel_layer", "inflation_layer"]
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 5.0
-        inflation_radius: 0.55
+        cost_scaling_factor: 10.0
+        inflation_radius: 0.5 #0.55
       voxel_layer:
         plugin: "nav2_costmap_2d::VoxelLayer"
         enabled: True
@@ -209,7 +209,7 @@ local_costmap:
         mark_threshold: 0
         observation_sources: pointcloud
         pointcloud:
-          topic: /zed/zed_node/point_cloud/cloud_registered
+          topic: /livox/lidar #/zed/zed_node/point_cloud/cloud_registered
           max_obstacle_height: 5.0
           clearing: True
           marking: True
@@ -218,7 +218,7 @@ local_costmap:
           raytrace_min_range: 0.0
           obstacle_max_range: 5.0
           obstacle_min_range: 0.0
-          min_obstacle_height: 0.12
+          min_obstacle_height: 0.0
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
         map_subscribe_transient_local: True
@@ -232,7 +232,7 @@ global_costmap:
       global_frame: map
       robot_base_frame: body #base_link
       use_sim_time: False
-      footprint: '[ [0.40, 0.40], [-0.7, 0.40], [-0.7, -0.40], [0.40, -0.40] ]'
+      footprint: '[ [0.50, 0.30], [-0.70, 0.30], [-0.70, -0.30], [0.50, -0.30] ]'
       resolution: 0.05
       track_unknown_space: true
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
@@ -255,8 +255,8 @@ global_costmap:
         map_subscribe_transient_local: True
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
-        cost_scaling_factor: 5.0
-        inflation_radius: 0.55
+        cost_scaling_factor: 10.0
+        inflation_radius: 0.5 # 0.55
       always_send_full_costmap: True
 
 map_server:
