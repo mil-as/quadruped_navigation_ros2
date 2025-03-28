@@ -79,10 +79,11 @@ class FrontierExplorerNode(Node):
 
         self.robot_position = current_position
 
-    def initial_search(self):
+        if self.home_position == (0, 0):
+            self.home_position = self.robot_position
+            self.get_logger().info(f"Home position recorded as: {self.home_position}")
 
-        self.home_position = self.robot_position
-        self.get_logger().info(f"Home position recorded as: {self.home_position}")
+    def initial_search(self):
 
         self.get_logger().info("Executing initial search")
 
@@ -249,8 +250,8 @@ class FrontierExplorerNode(Node):
             self.return_to_home()
             return
 
-        goal_x = chosen_frontier[1] * self.map_data.info.resolution + self.map_data.info.origin.position.x
-        goal_y = chosen_frontier[0] * self.map_data.info.resolution + self.map_data.info.origin.position.y
+        goal_x = float(chosen_frontier[1] * self.map_data.info.resolution + self.map_data.info.origin.position.x)
+        goal_y = float(chosen_frontier[0] * self.map_data.info.resolution + self.map_data.info.origin.position.y)
         self.navigate_to(goal_x, goal_y)
         self.start_time = self.get_clock().now().seconds_nanoseconds()[0]  # Oppdaterer starttimen når vi navigerer til en ny frontier
         self.current_frontier = chosen_frontier  # Oppdaterer nåværende frontier
