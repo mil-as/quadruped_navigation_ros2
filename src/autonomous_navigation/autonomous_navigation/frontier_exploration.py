@@ -43,7 +43,7 @@ class FrontierExplorerNode(Node):
         self.map_data = None
         self.robot_position = (0, 0)
         self.home_position = (0, 0)
-        self.is_navagating = False
+        self.is_navigating = False
 
         #Interval timer for explore method
 
@@ -208,7 +208,7 @@ class FrontierExplorerNode(Node):
         except Exception as e:
             self.get_logger().error(f"Navigation failed: {e}")
         finally:
-            self.is_navagating = False
+            self.is_navigating = False
 
     def return_to_home(self):
         """Navigate back to start position and shut down"""
@@ -232,7 +232,7 @@ class FrontierExplorerNode(Node):
             self.get_logger().warning("No map data available")
             return
         
-        if self.is_navagating:
+        if self.is_navigating:
             self.get_logger().info("Already navigating, skipping exploration")
             return
         
@@ -262,7 +262,7 @@ class FrontierExplorerNode(Node):
         self.navigate_to(goal_x, goal_y)
         self.start_time = self.get_clock().now().seconds_nanoseconds()[0]  # Oppdaterer starttimen når vi navigerer til en ny frontier
         self.current_frontier = chosen_frontier  # Oppdaterer nåværende frontier
-        self.is_navagating = True
+        self.is_navigating = True
 
 def main(args=None):
     rclpy.init(args=args)
