@@ -10,9 +10,9 @@ from nav_msgs.msg import OccupancyGrid, Odometry
 from nav2_msgs.action import NavigateToPose
 from rclpy.action import ActionClient
 
-MIN_FRONTIER_LENGTH = 20
+MIN_FRONTIER_LENGTH = 0.6
 STATIC_POSITION_TIMER = 10
-INITIAL_SEARCH_DURATION = 3
+INITIAL_SEARCH_DURATION = 5
 
 #A class that inherites from the node class
 #This class is used to controll the autonomous navigation
@@ -43,6 +43,7 @@ class FrontierExplorerNode(Node):
         self.map_data = None
         self.robot_position = (0, 0)
         self.home_position = (0, 0)
+        self.is_navagating = False
 
         #Interval timer for explore method
 
@@ -68,7 +69,7 @@ class FrontierExplorerNode(Node):
         #Odometry data processing
 
         current_position = (msg.pose.pose.position.x, msg.pose.pose.position.y)
-        self.get_logger().info(f"Updated robot position: {current_position}")
+        #self.get_logger().info(f"Updated robot position: {current_position}")
 
         if self.last_position_update_time is None:
             self.last_position_update_time = self.get_clock().now().seconds_nanoseconds()[0]
@@ -143,7 +144,7 @@ class FrontierExplorerNode(Node):
                 if map_array[r, c] == -1 and not visited[r, c]:
                     frontier, wall_contacts = bfs_find_frontier(r, c)
 
-                    if len(wall_contacts) == 2 and len(frontier) >= MIN_FRONTIER_LENGTH:
+                    if len(wall_contacts) >= 2 and len(frontier) >= MIN_FRONTIER_LENGTH:
                         frontiers.append(frontier)
 
         self.get_logger().info(f"Found {len(frontiers)} frontiers with length >= {MIN_FRONTIER_LENGTH}")
@@ -206,6 +207,8 @@ class FrontierExplorerNode(Node):
             self.get_logger().info(f"Navigation result: {result}")
         except Exception as e:
             self.get_logger().error(f"Navigation failed: {e}")
+        finally:
+            self.is_navagating = False
 
     def return_to_home(self):
         """Navigate back to start position and shut down"""
@@ -227,6 +230,10 @@ class FrontierExplorerNode(Node):
         """Periodic exploration logic."""
         if self.map_data is None:
             self.get_logger().warning("No map data available")
+            return
+        
+        if self.is_navagating:
+            self.get_logger().info("Already navigating, skipping exploration")
             return
         
         if self.start_time is not None and self.get_clock().now().seconds_nanoseconds()[0] - self.start_time > STATIC_POSITION_TIMER:
@@ -255,6 +262,7 @@ class FrontierExplorerNode(Node):
         self.navigate_to(goal_x, goal_y)
         self.start_time = self.get_clock().now().seconds_nanoseconds()[0]  # Oppdaterer starttimen når vi navigerer til en ny frontier
         self.current_frontier = chosen_frontier  # Oppdaterer nåværende frontier
+        self.is_navagating = True
 
 def main(args=None):
     rclpy.init(args=args)
