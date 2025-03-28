@@ -161,7 +161,7 @@ controller_server:
       vx_samples: 20
       vy_samples: 5
       vtheta_samples: 20
-      sim_time: 1.7
+      sim_time: 1.0 #1.7
       linear_granularity: 0.05
       angular_granularity: 0.025
       transform_tolerance: 0.2
@@ -169,7 +169,7 @@ controller_server:
       trans_stopped_velocity: 0.25
       short_circuit_trajectory_evaluation: True
       stateful: True
-      critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
+      critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "PathAlign", "PathDist", "GoalDist"]
       BaseObstacle.scale: 0.02
       PathAlign.scale: 32.0
       PathAlign.forward_point_distance: 0.1
@@ -178,7 +178,7 @@ controller_server:
       PathDist.scale: 32.0
       GoalDist.scale: 24.0
       RotateToGoal.scale: 32.0
-      RotateToGoal.slowing_factor: 5.0
+      RotateToGoal.slowing_factor: 5.0 #5
       RotateToGoal.lookahead_time: -1.0
 
 local_costmap:
@@ -190,10 +190,10 @@ local_costmap:
       robot_base_frame: body #base_link
       use_sim_time: False
       rolling_window: true
-      width: 5
-      height: 5
+      width: 7 #3
+      height: 7 #3
       resolution: 0.05
-      footprint: '[ [0.50, 0.30], [-0.70, 0.30], [-0.70, -0.30], [0.50, -0.30] ]'
+      footprint: '[ [0.50, 0.25], [-0.65, 0.25], [-0.65, -0.25], [0.50, -0.25] ]'
       plugins: ["stvl_layer", "inflation_layer"]
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"
@@ -202,7 +202,7 @@ local_costmap:
       stvl_layer:
         plugin: "spatio_temporal_voxel_layer/SpatioTemporalVoxelLayer"
         enabled: true
-        voxel_decay: 15.
+        voxel_decay: 5.
         decay_model: 0
         voxel_size: 0.05
         track_unknown_space: true
@@ -215,15 +215,15 @@ local_costmap:
         transform_tolerance: 0.2
         mapping_mode: false
         map_save_duration: 60.0
-        observation_sources: pointcloud
+        observation_sources: pointcloud pointcloudlivox
         pointcloud:
           data_type: PointCloud2
           topic: /zed/zed_node/point_cloud/cloud_registered
           marking: true
           clearing: true
-          obstacle_range: 3.0
-          min_obstacle_height: 0.0
-          max_obstacle_height: 2.0
+          obstacle_range: 5.0
+          min_obstacle_height: 0.12
+          max_obstacle_height: 1.5
           expected_update_rate: 0.0
           observation_persistence: 0.0
           inf_is_valid: false
@@ -236,6 +236,26 @@ local_costmap:
           horizontal_fov_angle: 1.048
           decay_acceleration: 15.0
           model_type: 0
+        pointcloudlivox:
+          data_type: PointCloud2
+          topic: /livox/lidar
+          marking: true
+          clearing: true
+          obstacle_range: 5.0
+          min_obstacle_height: 0.12
+          max_obstacle_height: 1.5
+          expected_update_rate: 0.0
+          observation_persistence: 0.0
+          inf_is_valid: false
+          filter: "voxel"
+          voxel_min_points: 0
+          clear_after_reading: true
+          max_z: 7.0
+          min_z: 0.1
+          vertical_fov_angle: 0.8745
+          horizontal_fov_angle: 6.28
+          decay_acceleration: 15.0
+          model_type: 1
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
         map_subscribe_transient_local: True
@@ -249,7 +269,7 @@ global_costmap:
       global_frame: map
       robot_base_frame: body #base_link
       use_sim_time: False
-      footprint: '[ [0.50, 0.30], [-0.70, 0.30], [-0.70, -0.30], [0.50, -0.30] ]'
+      footprint: '[ [0.50, 0.25], [-0.65, 0.25], [-0.65, -0.25], [0.50, -0.25] ]'
       resolution: 0.05
       track_unknown_space: true
       plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
