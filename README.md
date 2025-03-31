@@ -136,7 +136,7 @@ In terminal 1 run (Zenoh router):
 ros2 run rmw_zenoh_cpp rmw_zenohd
 ```
 
-In terminal 2 run (Spot drivers):
+In terminal 2 run (Spot driver):
 ```bash
 ros2 launch spot_driver spot_driver.launch.py config_file:=src/spot_config.yaml
 ```
@@ -151,7 +151,7 @@ In terminal 4 run (ZED2i driver)
 ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i
 ```
 
-In terminal 5 run (pointcloud to laserscan):
+In terminal 5 run (Pointcloud to laserscan):
 ```bash
 ros2 launch pointcloud_to_laserscan pointcloud_to_laserscan.py
 ```
