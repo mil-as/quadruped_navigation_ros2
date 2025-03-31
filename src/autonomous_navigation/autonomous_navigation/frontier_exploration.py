@@ -47,7 +47,7 @@ class FrontierExplorerNode(Node):
 
         #Interval timer for explore method
 
-        self.create_timer(5.0, self.explore)
+        #self.create_timer(5.0, self.explore)
 
         #Making a initial half turn for search where lidar cant see initially
 
@@ -211,7 +211,6 @@ class FrontierExplorerNode(Node):
         return chosen_frontier
 
 
-    
     def navigate_to(self, x, y):
         """Send navigation goal to Nav2."""
         goal_msg = PoseStamped()
@@ -273,16 +272,16 @@ class FrontierExplorerNode(Node):
         
         if self.is_navigating:
             self.get_logger().info(f"Navigation in progress to {self.current_frontier}")
-            # Wait until navigation is complete
-            while self.is_navigating:
-                if self.start_time is not None and self.get_clock().now().seconds_nanoseconds()[0] - self.start_time > STATIC_POSITION_TIMER:
+            # Check for time-related conditions to abandon frontier if necessary
+            if self.start_time is not None:
+                elapsed_time = self.get_clock().now().seconds_nanoseconds()[0] - self.start_time
+                if elapsed_time > STATIC_POSITION_TIMER:
                     if self.last_position_update_time is not None and (self.get_clock().now().seconds_nanoseconds()[0] - self.last_position_update_time) > STATIC_POSITION_TIMER:
                         self.abandoned_frontiers.add(tuple(self.current_frontier))
                         self.get_logger().info(f"Frontier {self.current_frontier} abandoned due to lack of progress")
                         self.start_time = None 
                         self.current_frontier = None
                         self.is_navigating = False
-                        return
 
         map_array = np.array(self.map_data.data).reshape((self.map_data.info.height, self.map_data.info.width))
         frontiers = self.identify_frontiers(map_array)
