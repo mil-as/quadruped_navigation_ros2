@@ -2,7 +2,7 @@
 
 
 #STVL layer for nav2 local costmap
-sudo apt-get install ros-humble-spatio-temporal-voxel-layer
+sudo apt-get install ros-humble-spatio-temporal-voxel-layer -y
 #required packages for nav 2 and for pointcloud convertion
 sudo apt update
 #sudo apt install ros-humble-gazebo-ros-pkgs -y Trengs denne?
