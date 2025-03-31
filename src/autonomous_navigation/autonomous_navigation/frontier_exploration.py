@@ -103,8 +103,41 @@ class FrontierExplorerNode(Node):
         self.cmd_vel_publisher.publish(search_stop_msg)
         self.get_logger().info("Completed initial search")
 
-    def identify_frontiers(self, map_array):
+    # def identify_frontiers(self, map_array):
 
+    #     rows, cols = map_array.shape
+    #     visited = np.zeros_like(map_array, dtype=bool)
+    #     frontiers = []
+
+    #     def is_valid_cell(r, c):
+    #         return 0 <= r < rows and 0 <= c < cols
+
+    #     def bfs_find_frontier(start_r, start_c):
+    #         queue = [(start_r, start_c)]
+    #         visited[start_r, start_c] = True
+    #         frontier = [(start_r, start_c)]
+
+    #         while queue:
+    #             r, c = queue.pop(0)
+
+    #             for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1), 
+    #                            (1, 1), (-1, -1), (1, -1), (-1, 1)]:
+    #                 nr, nc = r + dr, c + dc
+
+    #                 if is_valid_cell(nr, nc) and not visited[nr, nc]:
+    #                     if map_array[nr, nc] == 0:
+    #                         is_frontier = True
+    #                     if map_array[nr, nc] == -1:
+    #                         queue.append((nr, nc))
+    #                         visited[nr, nc] = True
+
+
+
+    #             frontier.append((nr, nc))
+
+    #         return frontier
+
+    def identify_frontiers(self, map_array):
         rows, cols = map_array.shape
         visited = np.zeros_like(map_array, dtype=bool)
         frontiers = []
@@ -115,58 +148,44 @@ class FrontierExplorerNode(Node):
         def bfs_find_frontier(start_r, start_c):
             queue = [(start_r, start_c)]
             visited[start_r, start_c] = True
-            frontier = [(start_r, start_c)]
+            potential_frontier = [(start_r, start_c)]
 
+        # Besøk hver celle i køen
             while queue:
                 r, c = queue.pop(0)
 
                 for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1), 
-                               (1, 1), (-1, -1), (1, -1), (-1, 1)]:
+                           (1, 1), (-1, -1), (1, -1), (-1, 1)]:
                     nr, nc = r + dr, c + dc
 
-                    if is_valid_cell(nr, nc) and not visited[nr, nc]:
-                        if map_array[nr, nc] == 0:
-                            if map_array[nr, nc] == -1:
-                                queue.append((nr, nc))
-                                visited[nr, nc] = True
-                                frontier.append((nr, nc))
+                    if is_valid_cell(nr, nc):
+                        if map_array[nr, nc] == -1 and not visited[nr, nc]:
+                            queue.append((nr, nc))
+                            visited[nr, nc] = True
+                            potential_frontier.append((nr, nc))
 
-            return frontier
+            # Avgjør om hver celle i potensiell frontier er gyldig (nabo til åpent område)
+            valid_frontier = []
+            for r, c in potential_frontier:
+                if any(is_valid_cell(r + dr, c + dc) and map_array[r + dr, c + dc] == 0 
+                   for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1), 
+                                  (1, 1), (-1, -1), (1, -1), (-1, 1)]):
+                        valid_frontier.append((r, c))
 
-        # Explore each unknown cell and find frontiers
+            return valid_frontier
+
+    # Explore each unknown cell and find frontiers
         for r in range(rows):
             for c in range(cols):
                 if map_array[r, c] == -1 and not visited[r, c]:
                     frontier = bfs_find_frontier(r, c)
 
-                    if len(frontier) >= MIN_FRONTIER_LENGTH:
-                        frontiers.append(frontier)
+                if len(frontier) >= MIN_FRONTIER_LENGTH:
+                    frontiers.append(frontier)
 
         self.get_logger().info(f"Found {len(frontiers)} frontiers with length more than {MIN_FRONTIER_LENGTH}")
         return frontiers
-    
-    def choose_frontier(self, frontiers):
 
-        robot_row = (self.robot_position[1]-self.map_data.info.origin.position.x)/self.map_data.info.resolution
-        robot_col = (self.robot_position[0]-self.map_data.info.origin.position.y)/self.map_data.info.resolution
-        min_distance, chosen_frontier = float('inf'), None
-
-        for frontier in frontiers:
-            center = np.mean(frontier, axis=0).astype(int)
-            if tuple(center) in self.explored_frontiers or tuple(center) in self.abandoned_frontiers:
-                continue
-            
-            distance = np.hypot(robot_row - center[0], robot_col - center[1])
-            if distance < min_distance:
-                min_distance, chosen_frontier = distance, center
-
-        if chosen_frontier is not None:
-            self.explored_frontiers.add(tuple(chosen_frontier))
-            self.get_logger().info(f"Chosen frontier center: {chosen_frontier}")
-        else:
-            self.get_logger().warning("No valid frontier found")
-
-        return chosen_frontier
     
     def navigate_to(self, x, y):
         """Send navigation goal to Nav2."""
