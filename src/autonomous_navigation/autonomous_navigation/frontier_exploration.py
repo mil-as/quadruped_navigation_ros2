@@ -185,6 +185,31 @@ class FrontierExplorerNode(Node):
 
         self.get_logger().info(f"Found {len(frontiers)} frontiers with length more than {MIN_FRONTIER_LENGTH}")
         return frontiers
+    
+
+    def choose_frontier(self, frontiers):
+
+        robot_row = (self.robot_position[1]-self.map_data.info.origin.position.x)/self.map_data.info.resolution
+        robot_col = (self.robot_position[0]-self.map_data.info.origin.position.y)/self.map_data.info.resolution
+        min_distance, chosen_frontier = float('inf'), None
+
+        for frontier in frontiers:
+            center = np.mean(frontier, axis=0).astype(int)
+            if tuple(center) in self.explored_frontiers or tuple(center) in self.abandoned_frontiers:
+                continue
+        
+            distance = np.hypot(robot_row - center[0], robot_col - center[1])
+            if distance < min_distance:
+                min_distance, chosen_frontier = distance, center
+
+        if chosen_frontier is not None:
+            self.explored_frontiers.add(tuple(chosen_frontier))
+            self.get_logger().info(f"Chosen frontier center: {chosen_frontier}")
+        else:
+            self.get_logger().warning("No valid frontier found")
+
+        return chosen_frontier
+
 
     
     def navigate_to(self, x, y):
