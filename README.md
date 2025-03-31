@@ -48,12 +48,6 @@ cd ${ISAAC_ROS_WS}/src/isaac_ros_common && \
 
 To open a new terminal in the same container, run the same command.
 
-## Foxglove
-To start the ROS "Foxglove bridge":
-```bash
-ros2 launch foxglove_bridge foxglove_bridge_launch.xml
-```
-
 ## Livox MID360 setup
 
 Clone the Livox MID360 repository to the /src folder:
@@ -91,8 +85,6 @@ Or for arm64:
 cd ${ISAAC_ROS_WS}
 ./zed_setup.sh --arm64
 ```
-
-
 
 ## Pointcloud to laserscan
 Clone the humble branch to /src:
@@ -139,21 +131,48 @@ colcon build --symlink-install --cmake-args -DBUILD_TESTING=OFF -DROS_EDITION=RO
 ```
 ## Launch steps
 
-In terminal 1 run (Slam_toolbox, Glim and Pointcloud_to_laserscan):
-
+In terminal 1 run (Zenoh router):
 ```bash
-ros2 launch nav_launch nav.launch.py 
-```
-In terminal 2 run (nav2 navigation):
-
-```bash
-ros2 launch nav2_bringup navigation_launch.py params_file:=/workspaces/isaac_ros-dev/src/nav_launch/config/nav2_params.yaml 
+ros2 run rmw_zenoh_cpp rmw_zenohd
 ```
 
-In terminal 3 run (Spot drivers):
-
+In terminal 2 run (Spot drivers):
 ```bash
- ros2 launch spot_driver spot_driver.launch.py config_file:=src/spot_config.yaml 
+ros2 launch spot_driver spot_driver.launch.py config_file:=src/spot_config.yaml
 ```
 
+In terminal 3 run (mid360 driver):
+```bash
+ros2 launch livox_ros_driver2 msg_MID360.py
+```
 
+In terminal 4 run (ZED2i driver)
+```bash
+ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i
+```
+
+In terminal 5 run (pointcloud to laserscan):
+```bash
+ros2 launch pointcloud_to_laserscan pointcloud_to_laserscan.py
+```
+
+In terminal 6 run (GLIM):
+```bash
+ros2 run glim_ros glim_rosnode --ros-args -p config_path:=/workspaces/isaac_ros-dev/src/nav_launch/config/
+```
+
+In terminal 7 run (Slam toolbox):
+```bash
+ros2 launch slam_toolbox online_async_launch.py slam_params_file:=src/nav_launch/config/mapper_params_online_async.yaml
+```
+
+In terminal 8 run (NAV2):
+```bash
+ros2 launch nav2_bringup navigation_launch.py params_file:=/workspaces/isaac_ros-dev/src/nav_launch/config/nav2_params.yaml
+```
+
+## Foxglove
+To start the ROS "Foxglove bridge":
+```bash
+ros2 launch foxglove_bridge foxglove_bridge_launch.xml
+```
