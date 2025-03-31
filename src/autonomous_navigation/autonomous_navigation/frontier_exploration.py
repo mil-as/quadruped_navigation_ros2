@@ -112,14 +112,10 @@ class FrontierExplorerNode(Node):
         def is_valid_cell(r, c):
             return 0 <= r < rows and 0 <= c < cols
 
-        def is_wall(r, c):
-            return map_array[r, c] == 100
-
         def bfs_find_frontier(start_r, start_c):
             queue = [(start_r, start_c)]
             visited[start_r, start_c] = True
             frontier = [(start_r, start_c)]
-            wall_contacts = []
 
             while queue:
                 r, c = queue.pop(0)
@@ -129,25 +125,24 @@ class FrontierExplorerNode(Node):
                     nr, nc = r + dr, c + dc
 
                     if is_valid_cell(nr, nc) and not visited[nr, nc]:
-                        if map_array[nr, nc] == -1:
-                            queue.append((nr, nc))
-                            visited[nr, nc] = True
-                            frontier.append((nr, nc))
-                        elif is_wall(nr, nc):
-                            wall_contacts.append((nr, nc))
+                        if map_array[nr, nc] == 0:
+                            if map_array[nr, nc] == -1:
+                                queue.append((nr, nc))
+                                visited[nr, nc] = True
+                                frontier.append((nr, nc))
 
-            return frontier, wall_contacts
+            return frontier
 
         # Explore each unknown cell and find frontiers
         for r in range(rows):
             for c in range(cols):
                 if map_array[r, c] == -1 and not visited[r, c]:
-                    frontier, wall_contacts = bfs_find_frontier(r, c)
+                    frontier = bfs_find_frontier(r, c)
 
-                    if len(wall_contacts) >= 2 and len(frontier) >= MIN_FRONTIER_LENGTH:
+                    if len(frontier) >= MIN_FRONTIER_LENGTH:
                         frontiers.append(frontier)
 
-        self.get_logger().info(f"Found {len(frontiers)} frontiers with length >= {MIN_FRONTIER_LENGTH}")
+        self.get_logger().info(f"Found {len(frontiers)} frontiers with length more than {MIN_FRONTIER_LENGTH}")
         return frontiers
     
     def choose_frontier(self, frontiers):
@@ -233,15 +228,17 @@ class FrontierExplorerNode(Node):
             return
         
         if self.is_navigating:
-            self.get_logger().info("Already navigating, skipping exploration")
-            return
-        
-        if self.start_time is not None and self.get_clock().now().seconds_nanoseconds()[0] - self.start_time > STATIC_POSITION_TIMER:
-            if self.last_position_update_time is not None and (self.get_clock().now().seconds_nanoseconds()[0] - self.last_position_update_time) > STATIC_POSITION_TIMER:
-                self.abandoned_frontiers.add(tuple(self.current_frontier))
-                self.get_logger().info(f"Frontier {self.current_frontier} abandoned due to lack of progress")
-                self.start_time = None 
-                self.current_frontier = None
+            self.get_logger().info(f"Navigation in progress to {self.current_frontier}")
+            # Wait until navigation is complete
+            while self.is_navigating:
+                if self.start_time is not None and self.get_clock().now().seconds_nanoseconds()[0] - self.start_time > STATIC_POSITION_TIMER:
+                    if self.last_position_update_time is not None and (self.get_clock().now().seconds_nanoseconds()[0] - self.last_position_update_time) > STATIC_POSITION_TIMER:
+                        self.abandoned_frontiers.add(tuple(self.current_frontier))
+                        self.get_logger().info(f"Frontier {self.current_frontier} abandoned due to lack of progress")
+                        self.start_time = None 
+                        self.current_frontier = None
+                        self.is_navigating = False
+                        return
 
         map_array = np.array(self.map_data.data).reshape((self.map_data.info.height, self.map_data.info.width))
         frontiers = self.identify_frontiers(map_array)
