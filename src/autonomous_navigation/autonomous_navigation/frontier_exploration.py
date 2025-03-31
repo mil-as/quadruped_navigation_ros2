@@ -10,7 +10,7 @@ from nav_msgs.msg import OccupancyGrid, Odometry
 from nav2_msgs.action import NavigateToPose
 from rclpy.action import ActionClient
 
-MIN_FRONTIER_LENGTH = 0.6
+MIN_FRONTIER_LENGTH = 25
 STATIC_POSITION_TIMER = 10
 INITIAL_SEARCH_DURATION = 5
 
