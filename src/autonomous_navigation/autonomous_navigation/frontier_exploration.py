@@ -271,10 +271,6 @@ class FrontierExplorerNode(Node):
             return
         
         if self.is_navigating:
-            self.get_logger().info("Navigating to frontier")
-            return
-        
-        if self.is_navigating:
             self.get_logger().info(f"Navigation in progress to {self.current_frontier}")
             # Check for time-related conditions to abandon frontier if necessary
             if self.start_time is not None:
@@ -286,6 +282,8 @@ class FrontierExplorerNode(Node):
                         self.start_time = None 
                         self.current_frontier = None
                         self.is_navigating = False
+                else:
+                    return
 
         map_array = np.array(self.map_data.data).reshape((self.map_data.info.height, self.map_data.info.width))
         frontiers = self.identify_frontiers(map_array)
