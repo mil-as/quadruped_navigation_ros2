@@ -143,7 +143,7 @@ ros2 launch spot_driver spot_driver.launch.py config_file:=src/spot_config.yaml
 
 In terminal 3 run (mid360 driver):
 ```bash
-ros2 launch livox_ros_driver2 msg_MID360.py
+ros2 launch livox_ros_driver2 msg_MID360_launch.py
 ```
 
 In terminal 4 run (ZED2i driver)
@@ -153,7 +153,7 @@ ros2 launch zed_wrapper zed_camera.launch.py camera_model:=zed2i
 
 In terminal 5 run (Pointcloud to laserscan):
 ```bash
-ros2 launch pointcloud_to_laserscan pointcloud_to_laserscan.py
+ros2 launch pointcloud_to_laserscan pointcloud_to_laserscan_launch.py
 ```
 
 In terminal 6 run (GLIM):
