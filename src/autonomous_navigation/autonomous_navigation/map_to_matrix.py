@@ -11,6 +11,7 @@ class MapToArrayNode(Node):
 
         self.map_subscribe = self.create_subscription(OccupancyGrid, '/map', self.map_callback, 10)
 
+        self.map_data = None
         map_array = np.array(self.map_data.data).reshape((self.map_data.info.height, self.map_data.info.width))
 
         self.array_to_csv(map_array)
