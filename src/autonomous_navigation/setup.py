@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-        'frontierExploration = autonomous_navigation.frontier_exploration:main'
+        'frontierExploration = autonomous_navigation.frontier_exploration:main',
+        'mapToMatrix = autonomous_navigation.map_to_matrix:main'
         ],
     },
 )
