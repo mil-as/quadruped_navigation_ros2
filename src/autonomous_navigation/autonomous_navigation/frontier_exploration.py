@@ -10,7 +10,7 @@ from nav_msgs.msg import OccupancyGrid, Odometry
 from nav2_msgs.action import NavigateToPose
 from rclpy.action import ActionClient
 
-MIN_FRONTIER_LENGTH = 25
+MIN_FRONTIER_LENGTH = 125
 STATIC_POSITION_TIMER = 10
 INITIAL_SEARCH_DURATION = 5
 
@@ -47,7 +47,7 @@ class FrontierExplorerNode(Node):
 
         #Interval timer for explore method
 
-        #self.create_timer(5.0, self.explore)
+        self.create_timer(5.0, self.explore)
 
         #Making a initial half turn for search where lidar cant see initially
 
@@ -261,13 +261,17 @@ class FrontierExplorerNode(Node):
         self.navigate_to(goal_x, goal_y)
 
         # Shut down after reaching home
-        self.get_logger().info("Reached start position, shutting down.")
+        self.get_logger().info("Heading home boys!")
         rclpy.shutdown()
 
     def explore(self):
         """Periodic exploration logic."""
         if self.map_data is None:
             self.get_logger().warning("No map data available")
+            return
+        
+        if self.is_navigating:
+            self.get_logger().info("Navigating to frontier")
             return
         
         if self.is_navigating:
