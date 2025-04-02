@@ -104,7 +104,6 @@ class FrontierExplorerNode(Node):
         self.get_logger().info("Completed initial search")
 
     # def identify_frontiers(self, map_array):
-
     #     rows, cols = map_array.shape
     #     visited = np.zeros_like(map_array, dtype=bool)
     #     frontiers = []
@@ -115,28 +114,43 @@ class FrontierExplorerNode(Node):
     #     def bfs_find_frontier(start_r, start_c):
     #         queue = [(start_r, start_c)]
     #         visited[start_r, start_c] = True
-    #         frontier = [(start_r, start_c)]
+    #         potential_frontier = [(start_r, start_c)]
 
+    #     # Besøk hver celle i køen
     #         while queue:
     #             r, c = queue.pop(0)
 
     #             for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1), 
-    #                            (1, 1), (-1, -1), (1, -1), (-1, 1)]:
+    #                        (1, 1), (-1, -1), (1, -1), (-1, 1)]:
     #                 nr, nc = r + dr, c + dc
 
-    #                 if is_valid_cell(nr, nc) and not visited[nr, nc]:
-    #                     if map_array[nr, nc] == 0:
-    #                         is_frontier = True
-    #                     if map_array[nr, nc] == -1:
+    #                 if is_valid_cell(nr, nc):
+    #                     if map_array[nr, nc] == -1 and not visited[nr, nc]:
     #                         queue.append((nr, nc))
     #                         visited[nr, nc] = True
+    #                         potential_frontier.append((nr, nc))
 
+    #         # Avgjør om hver celle i potensiell frontier er gyldig (nabo til åpent område)
+    #         valid_frontier = []
+    #         for r, c in potential_frontier:
+    #             if any(is_valid_cell(r + dr, c + dc) and map_array[r + dr, c + dc] == 0 
+    #                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]):
+    #                     valid_frontier.append((r, c))
 
+    #         return valid_frontier
 
-    #             frontier.append((nr, nc))
+    # # Explore each unknown cell and find frontiers
+    #     for r in range(rows):
+    #         for c in range(cols):
+    #             if map_array[r, c] == -1 and not visited[r, c]:
+    #                 frontier = bfs_find_frontier(r, c)
 
-    #         return frontier
+    #             if len(frontier) >= MIN_FRONTIER_LENGTH:
+    #                 frontiers.append(frontier)
 
+    #     self.get_logger().info(f"Found {len(frontiers)} frontiers with length more than {MIN_FRONTIER_LENGTH}")
+    #     return frontiers
+    
     def identify_frontiers(self, map_array):
         rows, cols = map_array.shape
         visited = np.zeros_like(map_array, dtype=bool)
@@ -150,38 +164,29 @@ class FrontierExplorerNode(Node):
             visited[start_r, start_c] = True
             potential_frontier = [(start_r, start_c)]
 
-        # Besøk hver celle i køen
             while queue:
                 r, c = queue.pop(0)
-
-                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1), 
-                           (1, 1), (-1, -1), (1, -1), (-1, 1)]:
+                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1), (1, 1), (-1, -1), (1, -1), (-1, 1)]:
                     nr, nc = r + dr, c + dc
+                    if is_valid_cell(nr, nc) and map_array[nr, nc] == 0 and not visited[nr, nc]:
+                        queue.append((nr, nc))
+                        visited[nr, nc] = True
+                        potential_frontier.append((nr, nc))
 
-                    if is_valid_cell(nr, nc):
-                        if map_array[nr, nc] == -1 and not visited[nr, nc]:
-                            queue.append((nr, nc))
-                            visited[nr, nc] = True
-                            potential_frontier.append((nr, nc))
-
-            # Avgjør om hver celle i potensiell frontier er gyldig (nabo til åpent område)
             valid_frontier = []
             for r, c in potential_frontier:
-                if any(is_valid_cell(r + dr, c + dc) and map_array[r + dr, c + dc] == 0 
-                   for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1), 
-                                  (1, 1), (-1, -1), (1, -1), (-1, 1)]):
-                        valid_frontier.append((r, c))
+                if any(is_valid_cell(r + dr, c + dc) and map_array[r + dr, c + dc] == -1
+                       for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]):
+                    valid_frontier.append((r, c))
 
             return valid_frontier
 
-    # Explore each unknown cell and find frontiers
         for r in range(rows):
             for c in range(cols):
-                if map_array[r, c] == -1 and not visited[r, c]:
+                if map_array[r, c] == 0 and not visited[r, c]:
                     frontier = bfs_find_frontier(r, c)
-
-                if len(frontier) >= MIN_FRONTIER_LENGTH:
-                    frontiers.append(frontier)
+                    if len(frontier) >= MIN_FRONTIER_LENGTH:
+                        frontiers.append(frontier)
 
         self.get_logger().info(f"Found {len(frontiers)} frontiers with length more than {MIN_FRONTIER_LENGTH}")
         return frontiers
