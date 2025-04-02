@@ -121,14 +121,13 @@ class FrontierExplorerNode(Node):
                     no_bound_frontier.append((r, c))
 
             return no_bound_frontier
-        
+
         robot_x, robot_y = self.get_robot_cell()
         frontier_points = bfs_find_frontier(robot_x, robot_y)
 
-        def frontier_grouping(frontier_points, map_array):
-                
+        def frontier_grouping(frontier_points):
             frontier_points = sorted(frontier_points, key=lambda point: (point[0], point[1]))
-            grouped_frontiers = []  # Liste for å lagre grupper av punkter
+            grouped_frontiers = []
 
             def is_next_to_wall(r, c):
                 for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]:
@@ -181,21 +180,20 @@ class FrontierExplorerNode(Node):
                 self.get_logger().info(f"Found {len(grouped_frontiers)} with length more than {MIN_FRONTIER_LENGTH}")
 
             return grouped_frontiers
-        
+
         grouped_frontiers = frontier_grouping(frontier_points)
 
         def find_frontier_centers(grouped_frontiers):
-
             centers = []
             for frontier in grouped_frontiers:
                 avg_r = int(sum(point[0] for point in frontier) / len(frontier))
                 avg_c = int(sum(point[1] for point in frontier) / len(frontier))
                 centers.append((avg_r, avg_c))
-            return centers
-        
-        frontier_centers = find_frontier_centers(grouped_frontiers)
-        
-        return frontier_centers
+                return centers
+
+            frontier_centers = find_frontier_centers(grouped_frontiers)
+            
+            return frontier_centers
     
     def choose_frontier(self, frontier_centers):
 
