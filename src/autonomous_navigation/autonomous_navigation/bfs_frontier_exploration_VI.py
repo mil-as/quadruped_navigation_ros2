@@ -21,7 +21,8 @@ class FrontierExplorerNode(Node):
         self.map_subscribe = self.create_subscription(OccupancyGrid, '/map', self.map_callback, 10)
         self.odom_subscriber = self.create_subscription(Odometry, '/glim_ros/odom', self.pose_callback, 10)
         self.cmd_vel_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
-        self.nav_to_goal_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
+        #self.nav_to_goal_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
+        self.nav_to_goal_client = self.create_publisher(PoseStamped, '/goal_pose', 10)
 
         self.explored_frontiers = set()
         self.abandoned_frontiers = set()
@@ -191,9 +192,9 @@ class FrontierExplorerNode(Node):
                 centers.append((avg_r, avg_c))
                 return centers
 
-            frontier_centers = find_frontier_centers(grouped_frontiers)
+        frontier_centers = find_frontier_centers(grouped_frontiers)
             
-            return frontier_centers
+        return frontier_centers
     
     def choose_frontier(self, frontier_centers):
 
