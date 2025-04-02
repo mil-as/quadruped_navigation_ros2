@@ -178,7 +178,7 @@ class FrontierExplorerNode(Node):
                     if max_distance >= MIN_FRONTIER_LENGTH:
                         grouped_frontiers.append(current_frontier)
 
-                self.get_logger().info(f"Found {len(grouped_frontiers)} with length more than {MIN_FRONTIER_LENGTH}")
+            self.get_logger().info(f"Found {len(grouped_frontiers)} with length more than {MIN_FRONTIER_LENGTH}")
 
             return grouped_frontiers
 
@@ -203,6 +203,10 @@ class FrontierExplorerNode(Node):
         min_distance, chosen_frontier = float('inf'), None
 
         for center in frontier_centers:
+    
+            if tuple(center) in self.frontier_centers or tuple(center) in self.abandoned_frontiers:
+                continue
+
             distance = np.hypot(robot_row - center[0], robot_col - center[1])
             if distance < min_distance:
                 min_distance, chosen_frontier = distance, center
