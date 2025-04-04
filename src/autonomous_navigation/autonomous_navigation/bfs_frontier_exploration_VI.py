@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import numpy as np
-from concurrent.futures import ProcessPoolExecutor
+from collections import deque
 from math import sqrt
 
 import rclpy
@@ -37,21 +37,19 @@ class FrontierExplorerNode(Node):
         self.create_timer(10.0, self.explore)
         self.initial_search()
 
-
     def map_callback(self, msg):
-
         self.map_data = msg
 
-
     def pose_callback(self, msg):
-
         current_position = (msg.pose.pose.position.x, msg.pose.pose.position.y)
+        now = self.get_clock().now().seconds_nanoseconds()[0]
+
         if self.last_position_update_time is None:
-            self.last_position_update_time = self.get_clock().now().seconds_nanoseconds()[0]
+            self.last_position_update_time = now
 
         if np.hypot(current_position[0] - self.robot_position[0],
                     current_position[1] - self.robot_position[1]) >= 0.5:
-            self.last_position_update_time = self.get_clock().now().seconds_nanoseconds()[0]
+            self.last_position_update_time = now
 
         self.robot_position = current_position
 
@@ -59,34 +57,26 @@ class FrontierExplorerNode(Node):
             self.home_position = self.robot_position
             self.get_logger().info(f"Home position recorded as: {self.home_position}")
 
-
     def initial_search(self):
-        
         self.get_logger().info("Executing initial search")
         search_msg = Twist()
         current_time = self.get_clock().now().seconds_nanoseconds()[0]
 
-        while self.get_clock().now().seconds_nanoseconds()[0] < current_time + INITIAL_SEARCH_DURATION/4:
-            search_msg.angular.z = 0.5
-            self.cmd_vel_publisher.publish(search_msg)
-
-        while self.get_clock().now().seconds_nanoseconds()[0] <= current_time + INITIAL_SEARCH_DURATION/2:
-            search_msg.angular.z = -0.5
-            self.cmd_vel_publisher.publish(search_msg)
-
-        while self.get_clock().now().seconds_nanoseconds()[0] <= current_time + INITIAL_SEARCH_DURATION/4:
-            search_msg.angular.z = 0.5
-            self.cmd_vel_publisher.publish(search_msg)
+        for duration, angular_z in [(INITIAL_SEARCH_DURATION / 4, 0.5),
+                                    (INITIAL_SEARCH_DURATION / 2, -0.5),
+                                    (INITIAL_SEARCH_DURATION / 4, 0.5)]:
+            end_time = current_time + duration
+            while self.get_clock().now().seconds_nanoseconds()[0] < end_time:
+                search_msg.angular.z = angular_z
+                self.cmd_vel_publisher.publish(search_msg)
 
         self.cmd_vel_publisher.publish(Twist())
         self.get_logger().info("Completed initial search")
 
-
     def get_robot_cell(self):
-
         if not self.map_data:
             return None
-        
+
         resolution = self.map_data.info.resolution
         origin = self.map_data.info.origin.position
 
@@ -94,7 +84,7 @@ class FrontierExplorerNode(Node):
         robot_col = int((self.robot_position[0] - origin.x) / resolution)
 
         return robot_row, robot_col
-    
+
     def identify_frontiers(self, map_array):
         rows, cols = map_array.shape
         visited = np.zeros_like(map_array, dtype=bool)
@@ -103,147 +93,93 @@ class FrontierExplorerNode(Node):
             return 0 <= r < rows and 0 <= c < cols
 
         def bfs_find_frontier(start_r, start_c):
-            queue = [(start_r, start_c)]
+            queue = deque([(start_r, start_c)])
             visited[start_r, start_c] = True
-            potential_frontier = [(start_r, start_c)]
+            potential_frontier = []
 
             while queue:
-                r, c = queue.pop(0)
+                r, c = queue.popleft()
+                if map_array[r, c] == 0:
+                    potential_frontier.append((r, c))
                 for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                     nr, nc = r + dr, c + dc
-                    if is_valid_cell(nr, nc) and map_array[nr, nc] == 0 and not visited[nr, nc]:
+                    if is_valid_cell(nr, nc) and not visited[nr, nc] and map_array[nr, nc] == 0:
                         queue.append((nr, nc))
                         visited[nr, nc] = True
-                        potential_frontier.append((nr, nc))
 
-            no_bound_frontier = []
-            for r, c in potential_frontier:
-                if any(is_valid_cell(r + dr, c + dc) and map_array[r + dr, c + dc] == -1
-                       for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]):
-                    no_bound_frontier.append((r, c))
-
-            return no_bound_frontier
+            return [(r, c) for r, c in potential_frontier if any(
+                is_valid_cell(r + dr, c + dc) and map_array[r + dr, c + dc] == -1
+                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)])]
 
         robot_x, robot_y = self.get_robot_cell()
+        if robot_x is None or robot_y is None:
+            return []
+
         frontier_points = bfs_find_frontier(robot_x, robot_y)
 
-        def frontier_grouping(frontier_points):
-            frontier_points = sorted(frontier_points, key=lambda point: (point[0], point[1]))
+        def group_frontiers(frontier_points):
             grouped_frontiers = []
+            frontier_set = set(frontier_points)
 
-            def is_next_to_wall(r, c):
-                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]:
-                    nr, nc = r + dr, c + dc
-                    if 0 <= nr < map_array.shape[0] and 0 <= nc < map_array.shape[1]:
-                        if map_array[nr, nc] == 100:
-                            return True
-                return False
-
-            def get_neighbors(r, c):
-                neighbors = []
-                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1), (-1, -1), (-1, 1), (1, -1), (1, 1)]:
-                    nr, nc = r + dr, c + dc
-                    if 0 <= nr < map_array.shape[0] and 0 <= nc < map_array.shape[1]:
-                        neighbors.append((nr, nc))
-                return neighbors
-
-            def process_frontier(start_point):
-                """Process a single frontier starting from a given point."""
+            while frontier_set:
+                start_point = frontier_set.pop()
+                queue = deque([start_point])
                 current_frontier = [start_point]
-                frontier_points.remove(start_point)
 
-                i = 0
-                while i < len(current_frontier):
-                    r, c = current_frontier[i]
-                    neighbors = get_neighbors(r, c)
-                    for neighbor in neighbors:
-                        if neighbor in frontier_points:
+                while queue:
+                    r, c = queue.popleft()
+                    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                        neighbor = (r + dr, c + dc)
+                        if neighbor in frontier_set:
+                            queue.append(neighbor)
                             current_frontier.append(neighbor)
-                            frontier_points.remove(neighbor)
-                    i += 1
+                            frontier_set.remove(neighbor)
 
                 if len(current_frontier) >= 2:
                     max_distance = max(
                         sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
                         for p1 in current_frontier for p2 in current_frontier)
                     if max_distance >= MIN_FRONTIER_LENGTH:
-                        return current_frontier
-                return None
+                        grouped_frontiers.append(current_frontier)
 
-            # Parallel processing of frontiers
-            with ProcessPoolExecutor() as executor:
-                futures = []
-                while frontier_points:
-                    start_point = None
-                    for point in frontier_points:
-                        if is_next_to_wall(point[0], point[1]):
-                            start_point = point
-                            break
-
-                    if not start_point:
-                        break
-
-                    # Submit the task to the executor
-                    futures.append(executor.submit(process_frontier, start_point))
-
-                # Collect results
-                for future in futures:
-                    result = future.result()
-                    if result:
-                        grouped_frontiers.append(result)
-
-            self.get_logger().info(f"Found {len(grouped_frontiers)} frontiers with length more than {MIN_FRONTIER_LENGTH}")
             return grouped_frontiers
 
-        grouped_frontiers = frontier_grouping(frontier_points)
+        grouped_frontiers = group_frontiers(frontier_points)
 
-        centers = []
+        return [(int(sum(p[0] for p in frontier) / len(frontier)),
+                 int(sum(p[1] for p in frontier) / len(frontier))) for frontier in grouped_frontiers]
 
-        def find_frontier_centers(centers, grouped_frontiers):
-            for frontier in grouped_frontiers:
-                avg_r = int(sum(point[0] for point in frontier) / len(frontier))
-                avg_c = int(sum(point[1] for point in frontier) / len(frontier))
-                centers.append((avg_r, avg_c))
-
-        find_frontier_centers(centers, grouped_frontiers)
-
-        return centers
-    
     def choose_frontier(self, frontier_centers):
-
         robot_row, robot_col = self.get_robot_cell()
         if robot_row is None or robot_col is None:
-            self.get_logger().info("Robot position not avalible")
-        min_distance, chosen_frontier = float('inf'), None
+            self.get_logger().info("Robot position not available")
+            return None
 
-        for center in frontier_centers:
-            if tuple(center) in self.abandoned_frontiers:
-                continue
+        chosen_frontier = min(
+            (center for center in frontier_centers if tuple(center) not in self.abandoned_frontiers),
+            key=lambda center: np.hypot(robot_row - center[0], robot_col - center[1]),
+            default=None
+        )
 
-            distance = np.hypot(robot_row - center[0], robot_col - center[1])
-            if distance < min_distance:
-                min_distance, chosen_frontier = distance, center
-
-        if chosen_frontier is not None:
+        if chosen_frontier:
             self.explored_frontiers.add(tuple(chosen_frontier))
             self.get_logger().info(f"Chosen frontier center: {chosen_frontier}")
         else:
             self.get_logger().warning("No valid frontier found")
 
         return chosen_frontier
-    
-    def navigate_to(self, x, y):
 
+    def navigate_to(self, x, y):
         goal_msg = PoseStamped()
         goal_msg.header.frame_id = 'map'
         goal_msg.header.stamp = self.get_clock().now().to_msg()
         goal_msg.pose.position.x = x
         goal_msg.pose.position.y = y
         goal_msg.pose.orientation.w = 1.0
-        
+
         nav_goal = NavigateToPose.Goal()
         nav_goal.pose = goal_msg
-        
+
         self.get_logger().info(f"Navigating to: x={x}, y={y}")
         self.nav_to_goal_client.wait_for_server()
         send_goal_future = self.nav_to_goal_client.send_goal_async(nav_goal)
@@ -272,8 +208,7 @@ class FrontierExplorerNode(Node):
             self.get_logger().error("Start position is not recorded!")
             return
 
-        goal_x, goal_y = self.home_position
-        self.navigate_to(goal_x, goal_y)
+        self.navigate_to(*self.home_position)
         self.get_logger().info("Heading home boys!")
         rclpy.shutdown()
 
@@ -283,9 +218,9 @@ class FrontierExplorerNode(Node):
             return
 
         if self.is_navigating:
-            elapsed_time = self.get_clock().now().seconds_nanoseconds()[0] - self.start_time
-            if elapsed_time > STATIC_POSITION_TIMER and self.last_position_update_time is not None:
-                if (self.get_clock().now().seconds_nanoseconds()[0] - self.last_position_update_time) > STATIC_POSITION_TIMER:
+            now = self.get_clock().now().seconds_nanoseconds()[0]
+            if now - self.start_time > STATIC_POSITION_TIMER and self.last_position_update_time is not None:
+                if now - self.last_position_update_time > STATIC_POSITION_TIMER:
                     self.abandoned_frontiers.add(tuple(self.current_frontier))
                     self.get_logger().info(f"Frontier {self.current_frontier} abandoned due to lack of progress")
                     self.start_time = None
@@ -306,8 +241,8 @@ class FrontierExplorerNode(Node):
             self.return_to_home()
             return
 
-        goal_x = float(chosen_frontier[1] * self.map_data.info.resolution + self.map_data.info.origin.position.x)
-        goal_y = float(chosen_frontier[0] * self.map_data.info.resolution + self.map_data.info.origin.position.y)
+        goal_x = chosen_frontier[1] * self.map_data.info.resolution + self.map_data.info.origin.position.x
+        goal_y = chosen_frontier[0] * self.map_data.info.resolution + self.map_data.info.origin.position.y
         self.navigate_to(goal_x, goal_y)
         self.start_time = self.get_clock().now().seconds_nanoseconds()[0]
         self.current_frontier = chosen_frontier
@@ -328,7 +263,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-    
-    
-
-    
