@@ -21,8 +21,7 @@ class FrontierExplorerNode(Node):
         self.map_subscribe = self.create_subscription(OccupancyGrid, '/map', self.map_callback, 10)
         self.odom_subscriber = self.create_subscription(Odometry, '/glim_ros/odom', self.pose_callback, 10)
         self.cmd_vel_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
-        #self.nav_to_goal_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
-        self.nav_to_goal_client = self.create_publisher(PoseStamped, '/goal_pose', 10)
+        self.nav_to_goal_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
 
         self.explored_frontiers = set()
         self.abandoned_frontiers = set()
@@ -178,19 +177,19 @@ class FrontierExplorerNode(Node):
                     if max_distance >= MIN_FRONTIER_LENGTH:
                         grouped_frontiers.append(current_frontier)
 
-            self.get_logger().info(f"Found {len(grouped_frontiers)} with length more than {MIN_FRONTIER_LENGTH}")
+            self.get_logger().info(f"Found {len(grouped_frontiers)} frontiers with length more than {MIN_FRONTIER_LENGTH}")
 
             return grouped_frontiers
 
         grouped_frontiers = frontier_grouping(frontier_points)
 
+        centers = []
+        
         def find_frontier_centers(grouped_frontiers):
-            centers = []
             for frontier in grouped_frontiers:
                 avg_r = int(sum(point[0] for point in frontier) / len(frontier))
                 avg_c = int(sum(point[1] for point in frontier) / len(frontier))
                 centers.append((avg_r, avg_c))
-                return centers
 
         frontier_centers = find_frontier_centers(grouped_frontiers)
             
@@ -199,14 +198,14 @@ class FrontierExplorerNode(Node):
     def choose_frontier(self, frontier_centers):
 
         robot_row, robot_col = self.get_robot_cell()
-
+        if robot_row is None or robot_col is None:
+            self.get_logger().info("Robot position not avalible")
         min_distance, chosen_frontier = float('inf'), None
 
         for center in frontier_centers:
-    
-            if tuple(center) in self.frontier_centers or tuple(center) in self.abandoned_frontiers:
+            if tuple(center) in self.abandoned_frontiers:
                 continue
-
+            
             distance = np.hypot(robot_row - center[0], robot_col - center[1])
             if distance < min_distance:
                 min_distance, chosen_frontier = distance, center
@@ -261,7 +260,7 @@ class FrontierExplorerNode(Node):
 
         goal_x, goal_y = self.home_position
         self.navigate_to(goal_x, goal_y)
-        self.get_logger().info("Returning to start position...")
+        self.get_logger().info("Heading home boys!")
         rclpy.shutdown()
 
     def explore(self):
