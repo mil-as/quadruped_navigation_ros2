@@ -3,6 +3,7 @@
 import numpy as np
 from collections import deque
 from math import sqrt
+import threading
 
 import rclpy
 from rclpy.node import Node
@@ -33,12 +34,24 @@ class FrontierExplorerNode(Node):
         self.is_navigating = False
         self.start_time = None
         self.last_position_update_time = None
+        self.free_cells = set()  # Cache for free cells
+        self.frontiers = []  # Cache for frontiers
 
         self.create_timer(10.0, self.explore)
         self.initial_search()
 
     def map_callback(self, msg):
         self.map_data = msg
+        self.cache_free_cells()
+
+    def cache_free_cells(self):
+        """Cache all free cells (value 0) from the map."""
+        if self.map_data is None:
+            return
+
+        map_array = np.array(self.map_data.data).reshape((self.map_data.info.height, self.map_data.info.width))
+        self.free_cells = {(r, c) for r in range(map_array.shape[0]) for c in range(map_array.shape[1]) if map_array[r, c] == 0}
+        self.get_logger().info(f"Cached {len(self.free_cells)} free cells")
 
     def pose_callback(self, msg):
         current_position = (msg.pose.pose.position.x, msg.pose.pose.position.y)
@@ -111,43 +124,74 @@ class FrontierExplorerNode(Node):
                 is_valid_cell(r + dr, c + dc) and map_array[r + dr, c + dc] == -1
                 for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)])]
 
-        robot_x, robot_y = self.get_robot_cell()
-        if robot_x is None or robot_y is None:
-            return []
+        frontier_points = []
+        for cell in self.free_cells:
+            if not visited[cell[0], cell[1]]:
+                frontier_points.extend(bfs_find_frontier(cell[0], cell[1]))
 
-        frontier_points = bfs_find_frontier(robot_x, robot_y)
+        return self.group_frontiers(frontier_points)
 
-        def group_frontiers(frontier_points):
-            grouped_frontiers = []
-            frontier_set = set(frontier_points)
+    def group_frontiers(self, frontier_points):
+        """Group frontier points into clusters."""
+        grouped_frontiers = []
+        frontier_set = set(frontier_points)
 
-            while frontier_set:
-                start_point = frontier_set.pop()
-                queue = deque([start_point])
-                current_frontier = [start_point]
+        while frontier_set:
+            start_point = frontier_set.pop()
+            queue = deque([start_point])
+            current_frontier = [start_point]
 
-                while queue:
-                    r, c = queue.popleft()
-                    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                        neighbor = (r + dr, c + dc)
-                        if neighbor in frontier_set:
-                            queue.append(neighbor)
-                            current_frontier.append(neighbor)
-                            frontier_set.remove(neighbor)
+            while queue:
+                r, c = queue.popleft()
+                for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                    neighbor = (r + dr, c + dc)
+                    if neighbor in frontier_set:
+                        queue.append(neighbor)
+                        current_frontier.append(neighbor)
+                        frontier_set.remove(neighbor)
 
-                if len(current_frontier) >= 2:
-                    max_distance = max(
-                        sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
-                        for p1 in current_frontier for p2 in current_frontier)
-                    if max_distance >= MIN_FRONTIER_LENGTH:
-                        grouped_frontiers.append(current_frontier)
-
-            return grouped_frontiers
-
-        grouped_frontiers = group_frontiers(frontier_points)
+            if len(current_frontier) >= 2:
+                max_distance = max(
+                    sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
+                    for p1 in current_frontier for p2 in current_frontier)
+                if max_distance >= MIN_FRONTIER_LENGTH:
+                    grouped_frontiers.append(current_frontier)
 
         return [(int(sum(p[0] for p in frontier) / len(frontier)),
                  int(sum(p[1] for p in frontier) / len(frontier))) for frontier in grouped_frontiers]
+
+    def explore(self):
+        if self.map_data is None:
+            self.get_logger().warning("No map data available")
+            return
+
+        if self.is_navigating:
+            now = self.get_clock().now().seconds_nanoseconds()[0]
+            if now - self.start_time > STATIC_POSITION_TIMER and self.last_position_update_time is not None:
+                if now - self.last_position_update_time > STATIC_POSITION_TIMER:
+                    self.abandoned_frontiers.add(tuple(self.current_frontier))
+                    self.get_logger().info(f"Frontier {self.current_frontier} abandoned due to lack of progress")
+                    self.start_time = None
+                    self.current_frontier = None
+                    self.is_navigating = False
+            return
+
+        if not self.frontiers:
+            self.get_logger().info("No frontiers found. Exploration complete!")
+            self.return_to_home()
+            return
+
+        chosen_frontier = self.choose_frontier(self.frontiers)
+        if chosen_frontier is None:
+            self.return_to_home()
+            return
+
+        goal_x = chosen_frontier[1] * self.map_data.info.resolution + self.map_data.info.origin.position.x
+        goal_y = chosen_frontier[0] * self.map_data.info.resolution + self.map_data.info.origin.position.y
+        self.navigate_to(goal_x, goal_y)
+        self.start_time = self.get_clock().now().seconds_nanoseconds()[0]
+        self.current_frontier = chosen_frontier
+        self.is_navigating = True
 
     def choose_frontier(self, frontier_centers):
         robot_row, robot_col = self.get_robot_cell()
@@ -198,10 +242,18 @@ class FrontierExplorerNode(Node):
         try:
             result = future.result().result
             self.get_logger().info(f"Navigation result: {result}")
+            self.update_frontiers_after_navigation()
         except Exception as e:
             self.get_logger().error(f"Navigation failed: {e}")
         finally:
             self.is_navigating = False
+
+    def update_frontiers_after_navigation(self):
+        """Update frontiers after reaching a target."""
+        if self.map_data is not None and self.free_cells:
+            map_array = np.array(self.map_data.data).reshape((self.map_data.info.height, self.map_data.info.width))
+            self.frontiers = self.identify_frontiers(map_array)
+            self.get_logger().info(f"Updated frontiers: {len(self.frontiers)} found")
 
     def return_to_home(self):
         if self.home_position is None:
@@ -211,42 +263,6 @@ class FrontierExplorerNode(Node):
         self.navigate_to(*self.home_position)
         self.get_logger().info("Heading home boys!")
         rclpy.shutdown()
-
-    def explore(self):
-        if self.map_data is None:
-            self.get_logger().warning("No map data available")
-            return
-
-        if self.is_navigating:
-            now = self.get_clock().now().seconds_nanoseconds()[0]
-            if now - self.start_time > STATIC_POSITION_TIMER and self.last_position_update_time is not None:
-                if now - self.last_position_update_time > STATIC_POSITION_TIMER:
-                    self.abandoned_frontiers.add(tuple(self.current_frontier))
-                    self.get_logger().info(f"Frontier {self.current_frontier} abandoned due to lack of progress")
-                    self.start_time = None
-                    self.current_frontier = None
-                    self.is_navigating = False
-            return
-
-        map_array = np.array(self.map_data.data).reshape((self.map_data.info.height, self.map_data.info.width))
-        frontiers = self.identify_frontiers(map_array)
-
-        if not frontiers:
-            self.get_logger().info("No frontiers found. Exploration complete!")
-            self.return_to_home()
-            return
-
-        chosen_frontier = self.choose_frontier(frontiers)
-        if chosen_frontier is None:
-            self.return_to_home()
-            return
-
-        goal_x = chosen_frontier[1] * self.map_data.info.resolution + self.map_data.info.origin.position.x
-        goal_y = chosen_frontier[0] * self.map_data.info.resolution + self.map_data.info.origin.position.y
-        self.navigate_to(goal_x, goal_y)
-        self.start_time = self.get_clock().now().seconds_nanoseconds()[0]
-        self.current_frontier = chosen_frontier
-        self.is_navigating = True
 
 def main(args=None):
     rclpy.init(args=args)
