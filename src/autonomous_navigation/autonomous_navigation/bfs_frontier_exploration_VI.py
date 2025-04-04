@@ -1,13 +1,15 @@
 #! /usr/bin/env python
 
+import numpy as np
+from concurrent.futures import ProcessPoolExecutor
+from math import sqrt
+
 import rclpy
 from rclpy.node import Node
-import numpy as np
 from geometry_msgs.msg import PoseStamped, Twist
 from nav_msgs.msg import OccupancyGrid, Odometry
 from nav2_msgs.action import NavigateToPose
 from rclpy.action import ActionClient
-from math import sqrt
 
 MIN_FRONTIER_LENGTH = 20
 STATIC_POSITION_TIMER = 30
@@ -145,18 +147,8 @@ class FrontierExplorerNode(Node):
                         neighbors.append((nr, nc))
                 return neighbors
 
-            frontier_points = frontier_points[:]
-
-            while frontier_points:
-                start_point = None
-                for point in frontier_points:
-                    if is_next_to_wall(point[0], point[1]):
-                        start_point = point
-                        break
-
-                if not start_point:
-                    break
-
+            def process_frontier(start_point):
+                """Process a single frontier starting from a given point."""
                 current_frontier = [start_point]
                 frontier_points.remove(start_point)
 
@@ -175,25 +167,47 @@ class FrontierExplorerNode(Node):
                         sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
                         for p1 in current_frontier for p2 in current_frontier)
                     if max_distance >= MIN_FRONTIER_LENGTH:
-                        grouped_frontiers.append(current_frontier)
+                        return current_frontier
+                return None
+
+            # Parallel processing of frontiers
+            with ProcessPoolExecutor() as executor:
+                futures = []
+                while frontier_points:
+                    start_point = None
+                    for point in frontier_points:
+                        if is_next_to_wall(point[0], point[1]):
+                            start_point = point
+                            break
+
+                    if not start_point:
+                        break
+
+                    # Submit the task to the executor
+                    futures.append(executor.submit(process_frontier, start_point))
+
+                # Collect results
+                for future in futures:
+                    result = future.result()
+                    if result:
+                        grouped_frontiers.append(result)
 
             self.get_logger().info(f"Found {len(grouped_frontiers)} frontiers with length more than {MIN_FRONTIER_LENGTH}")
-
             return grouped_frontiers
 
         grouped_frontiers = frontier_grouping(frontier_points)
 
         centers = []
-        
-        def find_frontier_centers(grouped_frontiers):
+
+        def find_frontier_centers(centers, grouped_frontiers):
             for frontier in grouped_frontiers:
                 avg_r = int(sum(point[0] for point in frontier) / len(frontier))
                 avg_c = int(sum(point[1] for point in frontier) / len(frontier))
                 centers.append((avg_r, avg_c))
 
-        frontier_centers = find_frontier_centers(grouped_frontiers)
-            
-        return frontier_centers
+        find_frontier_centers(centers, grouped_frontiers)
+
+        return centers
     
     def choose_frontier(self, frontier_centers):
 
@@ -205,7 +219,7 @@ class FrontierExplorerNode(Node):
         for center in frontier_centers:
             if tuple(center) in self.abandoned_frontiers:
                 continue
-            
+
             distance = np.hypot(robot_row - center[0], robot_col - center[1])
             if distance < min_distance:
                 min_distance, chosen_frontier = distance, center
