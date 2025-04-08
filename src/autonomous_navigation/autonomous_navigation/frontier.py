@@ -12,7 +12,6 @@ from math import sqrt
 import numpy as np
 
 MIN_FRONTIER_LENGTH = 20
-STATIC_POSITION_TIMER = 30
 INITIAL_SEARCH_DURATION = 10
 
 class FrontierExplorerNode(Node):
@@ -25,19 +24,30 @@ class FrontierExplorerNode(Node):
         self.cmd_vel_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
         self.nav_to_goal_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
 
+
+        self.explored_frontiers = []
+
         self.map_data = None
         self.robot_position = (0, 0)
         self.home_position = (0, 0)
         self.is_navigating = False
 
-        self.create_timer(1.0, self.explore)
+        self.create_timer(5.0, self.explore)
         self.initial_search()
 
     def map_callback(self, msg):
         self.map_data = msg
 
+        self.get_logger().info("Map data received!")
+
     def pose_callback(self, msg):
         current_position = (msg.pose.pose.position.x, msg.pose.pose.position.y)
+
+        self.robot_position = current_position
+
+        if self.home_position == (0, 0):
+            self.home_position = self.robot_position
+            self.get_logger().info(f"Home position recorded as: {self.home_position}")
 
     def initial_search(self):
         self.get_logger().info("Executing initial search")
@@ -57,7 +67,6 @@ class FrontierExplorerNode(Node):
             self.cmd_vel_publisher.publish(search_msg)
 
         self.cmd_vel_publisher.publish(Twist())
-        self.get_logger().info("Completed initial search")
 
     def return_to_home(self):
         if self.home_position is None:
@@ -80,10 +89,18 @@ class FrontierExplorerNode(Node):
         robot_col = int((self.robot_position[0] - origin.x) / resolution)
 
         return robot_row, robot_col
+    
+    def get_coordinate(self, point):
+        
+        goal_x = float(point[1] * self.map_data.info.resolution + self.map_data.info.origin.position.x)
+        goal_y = float(point[0] * self.map_data.info.resolution + self.map_data.info.origin.position.y)
+
+        return tuple(goal_x, goal_y)
+
 
     def frontier_detection(self):
 
-        robot_x, robot_y = get_rob
+        robot_x, robot_y = self.home_position
         map_array = self.map_data
         rows, cols = map_array.shape
         visited = np.zeros_like(map_array, dtype=bool)
@@ -140,29 +157,37 @@ class FrontierExplorerNode(Node):
                 sqrt((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)
                 for p1 in frontier for p2 in frontier
             )
-            print(f"Max distance between points in frontier: {max_distance}")
+            self.get_logger().info(f"Max distance between points in frontier: {max_distance}")
             return max_distance >= MIN_FRONTIER_LENGTH
+        
+        def find_frontier_center(frontier):
+            avg_r = int(sum(point[0] for point in frontier) / len(frontier))
+            avg_c = int(sum(point[1] for point in frontier) / len(frontier))
+            return (avg_r, avg_c)
         
         while searching:
             if map_queue:
                 frontier_point = bfs_frontier_point(map_queue)
             elif not map_queue:
                 map_queue.append((robot_x, robot_y))
+                visited[robot_x, robot_y] = True
                 frontier_point = bfs_frontier_point(map_queue)
             
             frontier = bfs_find_frontier(frontier_point[0][0], frontier_point[0][1])
 
             if length_check(frontier):
                 searching = False
-                return frontier
-            else: 
+                self.explored_frontiers.append(frontier)
+                frontier_center = find_frontier_center(frontier)
+                return frontier_center
+            elif map_queue:
                 for r, c in frontier:
                     visited[r, c] = True
+            elif not map_queue:
 
-    def find_frontier_center(frontier):
-        avg_r = int(sum(point[0] for point in frontier) / len(frontier))
-        avg_c = int(sum(point[1] for point in frontier) / len(frontier))
-        return (avg_r, avg_c)
+                self.get_logger().info(f"All frontiers longer than {MIN_FRONTIER_LENGTH} has been explored")
+                self.return_to_home()
+                searching = False
 
     def navigate_to(self, x, y):
         goal_msg = PoseStamped()
@@ -179,3 +204,60 @@ class FrontierExplorerNode(Node):
         self.nav_to_goal_client.wait_for_server()
         send_goal_future = self.nav_to_goal_client.send_goal_async(nav_goal)
         send_goal_future.add_done_callback(self.goal_response_callback)
+
+    def goal_response_callback(self, future):
+        goal_handle = future.result()
+        if not goal_handle.accepted:
+            self.get_logger().warning("Goal rejected!")
+            return
+
+        self.get_logger().info("Goal accepted")
+        goal_handle.get_result_async().add_done_callback(self.navigation_complete_callback)
+
+    def navigation_complete_callback(self, future):
+        try:
+            result = future.result().result
+            self.get_logger().info(f"Navigation result: {result}")
+        except Exception as exept:
+            self.get_logger().error(f"Navigation failed: {exept}")
+        finally:
+            self.is_navigating = False
+
+    def explore(self):
+
+        if self.map_data is None:
+            self.get_logger().warning("No map data available")
+            return
+        
+        if self.is_navigating:
+            self.get_logger().info("Navigating")
+        else:
+            map_array = np.array(self.map_data.data).reshape((self.map_data.info.height, self.map_data.info.width))
+            frontier = self.frontier_detection(map_array)
+
+            frontier_coord = self.get_coordinate(frontier)
+            self.navigate_to(frontier_coord)
+            self.is_navigating = True
+
+def main(args=None):
+    rclpy.init(args=args)
+    frontier_explorer_node = FrontierExplorerNode()
+
+    try:
+        frontier_explorer_node.get_logger().info("Starting exploration...")
+        rclpy.spin(frontier_explorer_node)
+    except KeyboardInterrupt:
+        frontier_explorer_node.get_logger().info("Exploration stopped by user")
+    finally:
+        frontier_explorer_node.destroy_node()
+        rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
+
+
+            
+
+
+
+
