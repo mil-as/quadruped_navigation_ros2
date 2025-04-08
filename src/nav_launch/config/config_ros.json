@@ -40,8 +40,8 @@
     "points_time_offset": 0.0,
     "acc_scale":  9.81,  //9.81,
     // TF config
-    "imu_frame_id": "feet_center", //zed_imu_link
-    "lidar_frame_id": " ",  
+    "imu_frame_id": "livox_frame", //zed_imu_link
+    "lidar_frame_id": "",  
     "base_frame_id":"body" ,
     "odom_frame_id": "odom_glim",
     "map_frame_id": "map",
