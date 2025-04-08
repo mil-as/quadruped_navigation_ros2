@@ -24,7 +24,6 @@ class FrontierExplorerNode(Node):
         self.cmd_vel_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
         self.nav_to_goal_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
 
-
         self.explored_frontiers = []
 
         self.map_data = None
@@ -89,24 +88,19 @@ class FrontierExplorerNode(Node):
         robot_col = int((self.robot_position[0] - origin.x) / resolution)
 
         return robot_row, robot_col
-    
+
     def get_coordinate(self, point):
-        
         goal_x = float(point[1] * self.map_data.info.resolution + self.map_data.info.origin.position.x)
         goal_y = float(point[0] * self.map_data.info.resolution + self.map_data.info.origin.position.y)
 
         return tuple(goal_x, goal_y)
 
-
-    def frontier_detection(self):
-
+    def frontier_detection(self, map_array):
         robot_x, robot_y = self.home_position
-        map_array = self.map_data
         rows, cols = map_array.shape
         visited = np.zeros_like(map_array, dtype=bool)
         searching = True
         map_queue = []
-
 
         def is_valid_cell(r, c):
             return 0 <= r < rows and 0 <= c < cols
@@ -117,11 +111,9 @@ class FrontierExplorerNode(Node):
                 if is_valid_cell(nr, nc) and map_array[nr, nc] == 0:
                     return True
             return False
-        
-        def bfs_frontier_point(queue):
-            
-            frontier_point = []
 
+        def bfs_frontier_point(queue):
+            frontier_point = []
             while queue:
                 r, c = queue.pop(0)
                 for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
@@ -134,7 +126,7 @@ class FrontierExplorerNode(Node):
                         frontier_point.append((nr, nc))
                         return frontier_point
             return None
-        
+
         def bfs_find_frontier(start_r, start_c):
             queue = [(start_r, start_c)]
             visited[start_r, start_c] = True
@@ -149,7 +141,7 @@ class FrontierExplorerNode(Node):
                         visited[nr, nc] = True
                         frontier.append((nr, nc))
             return frontier
-        
+
         def length_check(frontier):
             if not frontier:
                 return False
@@ -159,12 +151,12 @@ class FrontierExplorerNode(Node):
             )
             self.get_logger().info(f"Max distance between points in frontier: {max_distance}")
             return max_distance >= MIN_FRONTIER_LENGTH
-        
+
         def find_frontier_center(frontier):
             avg_r = int(sum(point[0] for point in frontier) / len(frontier))
             avg_c = int(sum(point[1] for point in frontier) / len(frontier))
             return (avg_r, avg_c)
-        
+
         while searching:
             if map_queue:
                 frontier_point = bfs_frontier_point(map_queue)
@@ -172,7 +164,7 @@ class FrontierExplorerNode(Node):
                 map_queue.append((robot_x, robot_y))
                 visited[robot_x, robot_y] = True
                 frontier_point = bfs_frontier_point(map_queue)
-            
+
             frontier = bfs_find_frontier(frontier_point[0][0], frontier_point[0][1])
 
             if length_check(frontier):
@@ -184,8 +176,7 @@ class FrontierExplorerNode(Node):
                 for r, c in frontier:
                     visited[r, c] = True
             elif not map_queue:
-
-                self.get_logger().info(f"All frontiers longer than {MIN_FRONTIER_LENGTH} has been explored")
+                self.get_logger().info(f"All frontiers longer than {MIN_FRONTIER_LENGTH} have been explored")
                 self.return_to_home()
                 searching = False
 
@@ -224,11 +215,10 @@ class FrontierExplorerNode(Node):
             self.is_navigating = False
 
     def explore(self):
-
         if self.map_data is None:
             self.get_logger().warning("No map data available")
             return
-        
+
         if self.is_navigating:
             self.get_logger().info("Navigating")
         else:
@@ -254,10 +244,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-
-
-            
-
-
-
-
