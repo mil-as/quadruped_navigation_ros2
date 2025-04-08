@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
         'frontierExploration = autonomous_navigation.bfs_frontier_exploration_VI:main',
+        'testtesttest = autonomous_navigation.testest:main',
         'mapToMatrix = autonomous_navigation.map_to_matrix:main'
         ],
     },
