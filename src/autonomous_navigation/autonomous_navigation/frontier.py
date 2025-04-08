@@ -11,7 +11,7 @@ from rclpy.action import ActionClient
 from math import sqrt
 import numpy as np
 
-MIN_FRONTIER_LENGTH = 20
+MIN_FRONTIER_LENGTH = 50
 INITIAL_SEARCH_DURATION = 10
 
 class FrontierExplorerNode(Node):
@@ -20,7 +20,7 @@ class FrontierExplorerNode(Node):
         self.get_logger().info("Starting frontier exploration")
 
         self.map_subscribe = self.create_subscription(OccupancyGrid, '/map', self.map_callback, 10)
-        self.odom_subscriber = self.create_subscription(Odometry, '/glim_ros/odom', self.pose_callback, 10)
+        self.odom_subscriber = self.create_subscription(Odometry, '/odometry', self.pose_callback, 10)
         self.cmd_vel_publisher = self.create_publisher(Twist, '/cmd_vel', 10)
         self.nav_to_goal_client = ActionClient(self, NavigateToPose, 'navigate_to_pose')
 
@@ -37,9 +37,10 @@ class FrontierExplorerNode(Node):
     def map_callback(self, msg):
         self.map_data = msg
 
-        self.get_logger().info("Map data received!")
+        #self.get_logger().info("Map data received!")
 
     def pose_callback(self, msg):
+        #self.get_logger().info("Pose called back")
         current_position = (msg.pose.pose.position.x, msg.pose.pose.position.y)
 
         self.robot_position = current_position
@@ -93,10 +94,10 @@ class FrontierExplorerNode(Node):
         goal_x = float(point[1] * self.map_data.info.resolution + self.map_data.info.origin.position.x)
         goal_y = float(point[0] * self.map_data.info.resolution + self.map_data.info.origin.position.y)
 
-        return tuple(goal_x, goal_y)
+        return (goal_x, goal_y)
 
     def frontier_detection(self, map_array):
-        robot_x, robot_y = self.home_position
+        robot_x, robot_y = self.get_robot_cell()
         rows, cols = map_array.shape
         visited = np.zeros_like(map_array, dtype=bool)
         searching = True
@@ -184,8 +185,8 @@ class FrontierExplorerNode(Node):
         goal_msg = PoseStamped()
         goal_msg.header.frame_id = 'map'
         goal_msg.header.stamp = self.get_clock().now().to_msg()
-        goal_msg.pose.position.x = x
-        goal_msg.pose.position.y = y
+        goal_msg.pose.position.x = float(x)
+        goal_msg.pose.position.y = float(y)
         goal_msg.pose.orientation.w = 1.0
 
         nav_goal = NavigateToPose.Goal()
@@ -226,7 +227,7 @@ class FrontierExplorerNode(Node):
             frontier = self.frontier_detection(map_array)
 
             frontier_coord = self.get_coordinate(frontier)
-            self.navigate_to(frontier_coord)
+            self.navigate_to(frontier_coord[0], frontier_coord[1])
             self.is_navigating = True
 
 def main(args=None):
