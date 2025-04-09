@@ -13,6 +13,7 @@ import numpy as np
 
 MIN_FRONTIER_LENGTH = 300
 INITIAL_SEARCH_DURATION = 10
+STATIC_POSITION_TIMER = 10
 
 class FrontierExplorerNode(Node):
     def __init__(self):
@@ -30,9 +31,13 @@ class FrontierExplorerNode(Node):
         self.robot_position = (0, 0)
         self.home_position = (0, 0)
         self.is_navigating = False
+        self.abandoned_fronteirs = []
+        self.current_frontier = None
 
-        self.create_timer(5.0, self.explore)
         self.initial_search()
+        
+        self.ref_position = None
+        self.create_timer(STATIC_POSITION_TIMER, self.explore)
 
     def map_callback(self, msg):
         self.map_data = msg
@@ -42,6 +47,9 @@ class FrontierExplorerNode(Node):
     def pose_callback(self, msg):
         #self.get_logger().info("Pose called back")
         current_position = (msg.pose.pose.position.x, msg.pose.pose.position.y)
+
+        if self.ref_position == None:
+            self.ref_position = current_position
 
         self.robot_position = current_position
 
@@ -95,6 +103,15 @@ class FrontierExplorerNode(Node):
         goal_y = float(point[0] * self.map_data.info.resolution + self.map_data.info.origin.position.y)
 
         return (goal_x, goal_y)
+    
+    def static_position_check(self):
+
+        if np.hypot(self.ref_position[0] - self.robot_position[0],
+                    self.ref_position[1] - self.robot_position[1]) < 1:
+            return True
+        
+        self.ref_posititon = self.robot_position
+        return False
 
     def frontier_detection(self, map_array):
         robot_x, robot_y = self.get_robot_cell()
@@ -166,20 +183,23 @@ class FrontierExplorerNode(Node):
                 visited[robot_x, robot_y] = True
                 frontier_point = bfs_frontier_point(map_queue)
 
+            if frontier_point is None:
+                self.get_logger().info("All frontiers found!")
+                self.return_to_home()
+                searching = False
+                break
+
             frontier = bfs_find_frontier(frontier_point[0][0], frontier_point[0][1])
 
             if length_check(frontier):
                 searching = False
                 self.explored_frontiers.append(frontier)
                 frontier_center = find_frontier_center(frontier)
-                return frontier_center
+                if not frontier_center in self.abandoned_fronteirs:
+                    return frontier_center
             elif map_queue:
                 for r, c in frontier:
                     visited[r, c] = True
-            elif not map_queue:
-                self.get_logger().info(f"All frontiers longer than {MIN_FRONTIER_LENGTH} have been explored")
-                self.return_to_home()
-                searching = False
 
     def navigate_to(self, x, y):
         goal_msg = PoseStamped()
@@ -196,6 +216,7 @@ class FrontierExplorerNode(Node):
         self.nav_to_goal_client.wait_for_server()
         send_goal_future = self.nav_to_goal_client.send_goal_async(nav_goal)
         send_goal_future.add_done_callback(self.goal_response_callback)
+
 
     def goal_response_callback(self, future):
         goal_handle = future.result()
@@ -222,10 +243,15 @@ class FrontierExplorerNode(Node):
 
         if self.is_navigating:
             self.get_logger().info("Navigating")
+            if self.static_position_check():
+                self.get_logger().info("Abandoning frontier")
+                self.abandoned_fronteirs.append(self.current_frontier)
+                self.is_navigating = False
         else:
             map_array = np.array(self.map_data.data).reshape((self.map_data.info.height, self.map_data.info.width))
             frontier = self.frontier_detection(map_array)
 
+            self.current_frontier = frontier
             frontier_coord = self.get_coordinate(frontier)
             self.navigate_to(frontier_coord[0], frontier_coord[1])
             self.is_navigating = True
