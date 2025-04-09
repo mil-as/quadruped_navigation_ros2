@@ -11,9 +11,9 @@ from rclpy.action import ActionClient
 from math import sqrt
 import numpy as np
 
-MIN_FRONTIER_LENGTH = 300
+MIN_FRONTIER_LENGTH = 50
 INITIAL_SEARCH_DURATION = 10
-STATIC_POSITION_TIMER = 10
+STATIC_POSITION_TIMER = 15
 
 class FrontierExplorerNode(Node):
     def __init__(self):
@@ -30,14 +30,18 @@ class FrontierExplorerNode(Node):
         self.map_data = None
         self.robot_position = (0, 0)
         self.home_position = (0, 0)
-        self.is_navigating = False
-        self.abandoned_fronteirs = []
+        self.is_navigating = None
+        self.abandoned_frontiers = []
         self.current_frontier = None
 
         self.initial_search()
         
         self.ref_position = None
-        self.create_timer(STATIC_POSITION_TIMER, self.explore)
+        self.abandon = None
+        self.testvariabel = 0.0
+
+        self.create_timer(STATIC_POSITION_TIMER, self.static_position_check)
+        self.create_timer(3.0, self.explore)
 
     def map_callback(self, msg):
         self.map_data = msg
@@ -50,6 +54,7 @@ class FrontierExplorerNode(Node):
 
         if self.ref_position == None:
             self.ref_position = current_position
+            self.get_logger().info(f"Starting ref position recorded as {self.ref_position}")
 
         self.robot_position = current_position
 
@@ -106,12 +111,23 @@ class FrontierExplorerNode(Node):
     
     def static_position_check(self):
 
+        self.testvariabel = self.robot_position
+
+        self.get_logger().info(f"Ref position = {self.ref_position}")
+        self.get_logger().info(f"Robot position = {self.robot_position}")
+
         if np.hypot(self.ref_position[0] - self.robot_position[0],
-                    self.ref_position[1] - self.robot_position[1]) < 1:
-            return True
-        
-        self.ref_posititon = self.robot_position
-        return False
+                    self.ref_position[1] - self.robot_position[1]) < 0.5:
+            if self.abandon == None:
+                self.abandon = False
+            else:
+                self.abandon = True
+                self.get_logger().info("Abandoniing frontier")
+
+        if self.ref_position != self.robot_position:
+            self.ref_posititon = self.testvariabel
+            self.get_logger().info(self.testvariabel)
+            self.get_logger().info(f"New ref position is {self.ref_position}")
 
     def frontier_detection(self, map_array):
         robot_x, robot_y = self.get_robot_cell()
@@ -168,7 +184,7 @@ class FrontierExplorerNode(Node):
                 for p1 in frontier for p2 in frontier
             )
             self.get_logger().info(f"Max distance between points in frontier: {max_distance}")
-            return max_distance >= MIN_FRONTIER_LENGTH
+            return max_distance
 
         def find_frontier_center(frontier):
             avg_r = int(sum(point[0] for point in frontier) / len(frontier))
@@ -190,13 +206,22 @@ class FrontierExplorerNode(Node):
                 break
 
             frontier = bfs_find_frontier(frontier_point[0][0], frontier_point[0][1])
+            frontier_length = length_check(frontier)
 
-            if length_check(frontier):
-                searching = False
-                self.explored_frontiers.append(frontier)
+            if frontier_length >= MIN_FRONTIER_LENGTH:
                 frontier_center = find_frontier_center(frontier)
-                if not frontier_center in self.abandoned_fronteirs:
-                    return frontier_center
+
+                for lengths in self.abandoned_frontiers:
+                    if frontier_length == self.abandoned_fronteirs[lengths]:
+                        self.get_logger().info("Abandoned frontier, moving on")
+                        for r, c in frontier:
+                            visited[r, c] = True
+                            break
+
+                self.current_frontier = frontier_length
+                searching = False
+                return frontier_center
+
             elif map_queue:
                 for r, c in frontier:
                     visited[r, c] = True
@@ -223,8 +248,10 @@ class FrontierExplorerNode(Node):
         if not goal_handle.accepted:
             self.get_logger().warning("Goal rejected!")
             return
+        
+        if goal_handle.accepted:
+            self.get_logger().info("Goal accepted")
 
-        self.get_logger().info("Goal accepted")
         goal_handle.get_result_async().add_done_callback(self.navigation_complete_callback)
 
     def navigation_complete_callback(self, future):
@@ -241,20 +268,24 @@ class FrontierExplorerNode(Node):
             self.get_logger().warning("No map data available")
             return
 
+        if self.abandon:
+            self.is_navigating = False
+
         if self.is_navigating:
             self.get_logger().info("Navigating")
-            if self.static_position_check():
+            if self.abandon:
                 self.get_logger().info("Abandoning frontier")
                 self.abandoned_fronteirs.append(self.current_frontier)
                 self.is_navigating = False
+                self.abandon = False
         else:
             map_array = np.array(self.map_data.data).reshape((self.map_data.info.height, self.map_data.info.width))
             frontier = self.frontier_detection(map_array)
 
-            self.current_frontier = frontier
             frontier_coord = self.get_coordinate(frontier)
             self.navigate_to(frontier_coord[0], frontier_coord[1])
-            self.is_navigating = True
+            if not self.abandon:
+                self.is_navigating = True
 
 def main(args=None):
     rclpy.init(args=args)
