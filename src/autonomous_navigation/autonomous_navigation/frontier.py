@@ -36,9 +36,8 @@ class FrontierExplorerNode(Node):
 
         self.initial_search()
         
-        self.ref_position = None
+        self.ref_position = []
         self.abandon = None
-        self.testvariabel = 0.0
 
         self.create_timer(STATIC_POSITION_TIMER, self.static_position_check)
         self.create_timer(3.0, self.explore)
@@ -52,8 +51,8 @@ class FrontierExplorerNode(Node):
         #self.get_logger().info("Pose called back")
         current_position = (msg.pose.pose.position.x, msg.pose.pose.position.y)
 
-        if self.ref_position == None:
-            self.ref_position = current_position
+        if len(self.ref_position) < 1:
+            self.ref_position.append(current_position)
             self.get_logger().info(f"Starting ref position recorded as {self.ref_position}")
 
         self.robot_position = current_position
@@ -109,25 +108,33 @@ class FrontierExplorerNode(Node):
 
         return (goal_x, goal_y)
     
+    def update_ref_position(self):
+
+        self.ref_position.append(self.robot_position)
+    
     def static_position_check(self):
 
-        self.testvariabel = self.robot_position
+        self.get_logger().info("Checking if position is static")
 
         self.get_logger().info(f"Ref position = {self.ref_position}")
         self.get_logger().info(f"Robot position = {self.robot_position}")
 
-        if np.hypot(self.ref_position[0] - self.robot_position[0],
-                    self.ref_position[1] - self.robot_position[1]) < 0.5:
+        refrence_x, refrence_y = self.ref_position.pop(0)
+
+        trav_dist = np.hypot(refrence_x - self.robot_position[0],
+                    refrence_y - self.robot_position[1])
+        
+        self.get_logger().info(f"Taveled distance is {trav_dist}")
+
+        if trav_dist < 0.5:
             if self.abandon == None:
                 self.abandon = False
             else:
                 self.abandon = True
-                self.get_logger().info("Abandoniing frontier")
+                self.get_logger().info("Abandoning frontier")
 
-        if self.ref_position != self.robot_position:
-            self.ref_posititon = self.testvariabel
-            self.get_logger().info(self.testvariabel)
-            self.get_logger().info(f"New ref position is {self.ref_position}")
+        self.update_ref_position()
+        self.get_logger().info(f"New ref position is {self.ref_position}")
 
     def frontier_detection(self, map_array):
         robot_x, robot_y = self.get_robot_cell()
@@ -212,7 +219,7 @@ class FrontierExplorerNode(Node):
                 frontier_center = find_frontier_center(frontier)
 
                 for lengths in self.abandoned_frontiers:
-                    if frontier_length == self.abandoned_fronteirs[lengths]:
+                    if frontier_length == self.abandoned_frontiers[lengths]:
                         self.get_logger().info("Abandoned frontier, moving on")
                         for r, c in frontier:
                             visited[r, c] = True
@@ -275,7 +282,7 @@ class FrontierExplorerNode(Node):
             self.get_logger().info("Navigating")
             if self.abandon:
                 self.get_logger().info("Abandoning frontier")
-                self.abandoned_fronteirs.append(self.current_frontier)
+                self.abandoned_frontiers.append(self.current_frontier)
                 self.is_navigating = False
                 self.abandon = False
         else:
