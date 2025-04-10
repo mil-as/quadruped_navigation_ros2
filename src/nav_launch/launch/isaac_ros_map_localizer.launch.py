@@ -57,18 +57,6 @@ def generate_launch_description():
         remappings=[('localization_result', 'initialpose')]
     )
 
-
-    laserscan_to_flatscan_container = ComposableNodeContainer(
-        package='rclcpp_components',
-        name='laserscan_to_flatscan_container',
-        namespace='',
-        executable='component_container_mt',
-        composable_node_descriptions=[
-            laserscan_to_flatscan_node
-        ],
-        output='screen'
-    )
-
     occupancy_grid_localizer_container = ComposableNodeContainer(
         package='rclcpp_components',
         name='occupancy_grid_localizer_container',
@@ -76,6 +64,7 @@ def generate_launch_description():
         executable='component_container_mt',
         composable_node_descriptions=[
             occupancy_grid_localizer_node,
+            laserscan_to_flatscan_node
         ],
         output='screen'
     )
@@ -100,6 +89,12 @@ def generate_launch_description():
         ]
     )
 
+    baselink_basefootprint_publisher = Node(
+        package='tf2_ros', executable='static_transform_publisher',
+        parameters=[{'use_sim_time': False}],
+        output='screen',
+        arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'baselink', 'body'], #-2.8
+    )
 
     # Create the launch description and populate
     ld = LaunchDescription([map_yaml_launch_arg,])
@@ -107,6 +102,6 @@ def generate_launch_description():
     # Add the actions to launch all of the localiztion nodes
     ld.add_action(occupancy_grid_localizer_container)
     ld.add_action(load_nodes)
-    ld.add_action(laserscan_to_flatscan_container)
+    ld.add_action(baselink_basefootprint_publisher)
 
     return ld
