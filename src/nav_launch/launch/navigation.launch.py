@@ -39,6 +39,7 @@ def generate_launch_description():
     container_name_full = (namespace, '/', container_name)
     use_respawn = LaunchConfiguration('use_respawn')
     log_level = LaunchConfiguration('log_level')
+    mask_yaml_file = LaunchConfiguration('mask')
 
     lifecycle_nodes = ['controller_server',
                        'smoother_server',
@@ -46,7 +47,9 @@ def generate_launch_description():
                        'behavior_server',
                        'bt_navigator',
                        'waypoint_follower',
-                       'velocity_smoother']
+                       'velocity_smoother',
+                       'filter_mask_server',
+                       'costmap_filter_info_server']
 
     # Map fully qualified names to relative ones so the node's namespace can be prepended.
     # In case of the transforms (tf), currently, there doesn't seem to be a better alternative
@@ -60,7 +63,8 @@ def generate_launch_description():
     # Create our own temporary YAML files that include substitutions
     param_substitutions = {
         'use_sim_time': use_sim_time,
-        'autostart': autostart}
+        'autostart': autostart,
+        'yaml_filename': mask_yaml_file}
 
     configured_params = ParameterFile(
         RewrittenYaml(
@@ -108,9 +112,20 @@ def generate_launch_description():
         'log_level', default_value='info',
         description='log level')
 
+    declare_mask_yaml_file_cmd = DeclareLaunchArgument(
+        'mask',
+        description='Full path to filter mask yaml file to load')
+
     load_nodes = GroupAction(
         condition=IfCondition(PythonExpression(['not ', use_composition])),
         actions=[
+            Node(
+                package='nav2_amcl',
+                executable='amcl',
+                name='amcl',
+                output='screen',
+                parameters=[configured_params],
+                ),
             Node(
                 package='nav2_controller',
                 executable='controller_server',
@@ -264,15 +279,15 @@ def generate_launch_description():
                              'autostart': autostart,
                              'node_names': lifecycle_nodes}]),
             ComposableNode(
-                        package='nav2_map_server',
-                        plugin='nav2_map_server::MapServer',
-                        name='filter_mask_server',
-                        parameters=[configured_params]),
+                package='nav2_map_server',
+                plugin='nav2_map_server::MapServer',
+                name='filter_mask_server',
+                parameters=[configured_params]),
             ComposableNode(
-                        package='nav2_map_server',
-                        plugin='nav2_map_server::CostmapFilterInfoServer',
-                        name='costmap_filter_info_server',
-                        parameters=[configured_params]),
+                package='nav2_map_server',
+                plugin='nav2_map_server::CostmapFilterInfoServer',
+                name='costmap_filter_info_server',
+                parameters=[configured_params]),
         ],
     )
 
@@ -291,6 +306,7 @@ def generate_launch_description():
     ld.add_action(declare_container_name_cmd)
     ld.add_action(declare_use_respawn_cmd)
     ld.add_action(declare_log_level_cmd)
+    ld.add_action(declare_mask_yaml_file_cmd)
     # Add the actions to launch all of the navigation nodes
     ld.add_action(load_nodes)
     ld.add_action(load_composable_nodes)
