@@ -11,7 +11,7 @@ from rclpy.action import ActionClient
 from math import sqrt
 import numpy as np
 
-MIN_FRONTIER_LENGTH = 50
+MIN_FRONTIER_LENGTH = 20
 INITIAL_SEARCH_DURATION = 10
 STATIC_POSITION_TIMER = 15
 
@@ -210,7 +210,7 @@ class FrontierExplorerNode(Node):
                 self.get_logger().info("All frontiers found!")
                 self.return_to_home()
                 searching = False
-                break
+                return  
 
             frontier = bfs_find_frontier(frontier_point[0][0], frontier_point[0][1])
             frontier_length = length_check(frontier)
@@ -219,17 +219,18 @@ class FrontierExplorerNode(Node):
                 frontier_center = find_frontier_center(frontier)
 
                 for lengths in self.abandoned_frontiers:
-                    if frontier_length == self.abandoned_frontiers[lengths]:
+                    if self.abandoned_frontiers[lengths] - 0.5 < frontier_length < self.abandoned_frontiers[lengths]:
                         self.get_logger().info("Abandoned frontier, moving on")
                         for r, c in frontier:
                             visited[r, c] = True
                             break
 
-                self.current_frontier = frontier_length
-                searching = False
-                return frontier_center
+                    else:
+                        self.current_frontier = frontier_length
+                        searching = False
+                        return frontier_center
 
-            elif map_queue:
+            else:
                 for r, c in frontier:
                     visited[r, c] = True
 
@@ -263,12 +264,12 @@ class FrontierExplorerNode(Node):
 
     def navigation_complete_callback(self, future):
         try:
-            result = future.result().result
+            result = future.result()
             self.get_logger().info(f"Navigation result: {result}")
         except Exception as exept:
             self.get_logger().error(f"Navigation failed: {exept}")
-        finally:
-            self.is_navigating = False
+        #finally:
+            #self.is_navigating = False
 
     def explore(self):
         if self.map_data is None:
