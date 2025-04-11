@@ -20,24 +20,41 @@ import os
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
-from launch.actions import GroupAction
-from launch_ros.actions import ComposableNodeContainer
-from launch_ros.actions import Node
+from launch_ros.actions import ComposableNodeContainer, Node
 from launch_ros.descriptions import ComposableNode
-from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 
 def generate_launch_description():
-
-    lifecycle_nodes = ['map_server']
-
+    # Launch arguments
     map_yaml_launch_arg = DeclareLaunchArgument(
-            'map_yaml_path',
-            default_value=os.path.join(
-                get_package_share_directory('isaac_ros_occupancy_grid_localizer'), 'maps', 'kart_test.yaml'),
-            description='Full path to map yaml file'
+        'map_yaml_path',
+        default_value=os.path.join(
+            get_package_share_directory('isaac_ros_occupancy_grid_localizer'), 'maps', 'kart_test.yaml'),
+        description='Full path to map yaml file'
+    )
+    params_file_arg = DeclareLaunchArgument(
+        'nav2_param_file', default_value=os.path.join(
+            get_package_share_directory(
+                'nav_launch'),  'nav2_params.yaml'),
+        description='Full path to param file to load')
+
+    nav2_bringup_launch_dir = os.path.join(
+        get_package_share_directory('nav2_bringup'), 'launch')
+
+    # Launch nav2 using nav2 bringup package
+    nav2_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(nav2_bringup_launch_dir, 'bringup_launch.py')),
+        launch_arguments={
+            'map': LaunchConfiguration('map_yaml_path'),
+            'use_sim_time': 'False',
+            'params_file': LaunchConfiguration('nav2_param_file')
+        }.items(),
     )
 
+    # Launch laserscan to flatscan
     laserscan_to_flatscan_node = ComposableNode(
         package='isaac_ros_pointcloud_utils',
         plugin='nvidia::isaac_ros::pointcloud_utils::LaserScantoFlatScanNode',
@@ -46,6 +63,7 @@ def generate_launch_description():
         #remappings=[('/flatscan', '/flatscan_localization')]
     )
 
+    # Launch map localization
     occupancy_grid_localizer_node = ComposableNode(
         package='isaac_ros_occupancy_grid_localizer',
         plugin='nvidia::isaac_ros::occupancy_grid_localizer::OccupancyGridLocalizerNode',
@@ -54,9 +72,10 @@ def generate_launch_description():
             'loc_result_frame': 'map',
             'map_yaml_path': LaunchConfiguration('map_yaml_path'),
         }],
-        remappings=[('localization_result', 'initialpose')]
+        remappings=[('localization_result', '/initialpose')]
     )
 
+    # Add map localisation and lasercan to flatscan nodes in one container
     occupancy_grid_localizer_container = ComposableNodeContainer(
         package='rclcpp_components',
         name='occupancy_grid_localizer_container',
@@ -69,39 +88,21 @@ def generate_launch_description():
         output='screen'
     )
 
-    load_nodes = GroupAction(
-        actions=[
-            Node(
-                package='nav2_map_server',
-                executable='map_server',
-                name='map_server',
-                output='screen',
-                respawn_delay=2.0,
-                parameters=[{'yaml_filename': LaunchConfiguration('map_yaml_path')}]),
-            Node(
-                package='nav2_lifecycle_manager',
-                executable='lifecycle_manager',
-                name='lifecycle_manager_localization',
-                output='screen',
-                parameters=[{'use_sim_time': False},
-                            {'autostart': True},
-                            {'node_names': lifecycle_nodes}])
-        ]
-    )
-
-    baselink_basefootprint_publisher = Node(
-        package='tf2_ros', executable='static_transform_publisher',
-        parameters=[{'use_sim_time': False}],
-        output='screen',
-        arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'baselink', 'body'], #-2.8
-    )
+    # Publish base_frame to body 
+#    baselink_body_publisher = Node(
+#        package='tf2_ros', executable='static_transform_publisher',
+#        parameters=[{'use_sim_time': False}],
+#        output='screen',
+#        arguments=['0.0', '0.0', '0.0', '0.0', '0.0', '0.0', 'base_link', 'body'], #-2.8
+#    )
 
     # Create the launch description and populate
     ld = LaunchDescription([map_yaml_launch_arg,])
 
     # Add the actions to launch all of the localiztion nodes
+    ld.add_action(params_file_arg)
+    ld.add_action(nav2_launch)
     ld.add_action(occupancy_grid_localizer_container)
-    ld.add_action(load_nodes)
-    ld.add_action(baselink_basefootprint_publisher)
+#    ld.add_action(baselink_body_publisher)
 
     return ld

@@ -24,6 +24,7 @@ from launch_ros.actions import LoadComposableNodes
 from launch_ros.actions import Node
 from launch_ros.descriptions import ComposableNode, ParameterFile
 from nav2_common.launch import RewrittenYaml
+from launch.actions import TimerAction
 
 
 def generate_launch_description():
@@ -49,7 +50,10 @@ def generate_launch_description():
                        'waypoint_follower',
                        'velocity_smoother',
                        'filter_mask_server',
-                       'costmap_filter_info_server']
+                       'costmap_filter_info_server',
+                       'map_server',
+                       'amcl',
+                      ]
 
     # Map fully qualified names to relative ones so the node's namespace can be prepended.
     # In case of the transforms (tf), currently, there doesn't seem to be a better alternative
@@ -115,26 +119,43 @@ def generate_launch_description():
     declare_mask_yaml_file_cmd = DeclareLaunchArgument(
         'mask',
         description='Full path to filter mask yaml file to load')
+    
+    declare_map_yaml_cmd = DeclareLaunchArgument(
+        'map', default_value='', description='Full path to map yaml file to load')
 
     load_nodes = GroupAction(
         condition=IfCondition(PythonExpression(['not ', use_composition])),
         actions=[
             Node(
+                package='nav2_map_server',
+                executable='map_server',
+                name='map_server',
+                output='screen',
+                parameters=[
+                configured_params,
+                {'bond_name': 'lifecycle_manager_navigation'},
+                {'use_sim_time': use_sim_time},
+                {'autostart': True}
+                ]),
+            Node(
                 package='nav2_amcl',
                 executable='amcl',
                 name='amcl',
                 output='screen',
-                parameters=[configured_params],
-                ),
+                parameters=[
+                configured_params,
+                {'bond_name': 'lifecycle_manager_navigation'},
+                {'use_sim_time': use_sim_time},
+                {'autostart': autostart}
+                ]),
             Node(
                 package='nav2_controller',
                 executable='controller_server',
                 output='screen',
                 respawn=use_respawn,
                 respawn_delay=2.0,
-                parameters=[configured_params],
-                arguments=['--ros-args', '--log-level', log_level],
-                remappings=remappings + [('cmd_vel', 'cmd_vel_nav')]),
+                parameters=[configured_params,
+                {'use_sim_time': use_sim_time}]),
             Node(
                 package='nav2_smoother',
                 executable='smoother_server',
@@ -307,6 +328,7 @@ def generate_launch_description():
     ld.add_action(declare_use_respawn_cmd)
     ld.add_action(declare_log_level_cmd)
     ld.add_action(declare_mask_yaml_file_cmd)
+    ld.add_action(declare_map_yaml_cmd)
     # Add the actions to launch all of the navigation nodes
     ld.add_action(load_nodes)
     ld.add_action(load_composable_nodes)
