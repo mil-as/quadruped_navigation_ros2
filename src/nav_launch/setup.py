@@ -13,7 +13,8 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name), glob('launch/*.launch.py')),
-        (os.path.join('share', package_name), glob('config/*')),
+        (os.path.join('share', package_name, 'config'), glob('config/*')),
+        (os.path.join('share', package_name, 'maps'), glob('maps/*')),
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -23,7 +24,7 @@ setup(
     license='TODO: License declaration',
     tests_require=['pytest'],
     entry_points={
-        'console_scripts': [
+            'console_scripts': [
         ],
     },
 )
