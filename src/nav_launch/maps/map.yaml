@@ -1,4 +1,4 @@
-image: kart.pgm
+image: map.png
 mode: trinary
 resolution: 0.05
 origin: [-9.04, -28.6, 0]
