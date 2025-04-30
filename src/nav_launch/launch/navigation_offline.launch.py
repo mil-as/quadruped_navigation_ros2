@@ -20,6 +20,7 @@ import os
 from ament_index_python.packages import get_package_share_directory
 
 from launch import LaunchDescription
+from launch.conditions import IfCondition
 from launch_ros.actions import ComposableNodeContainer, Node
 from launch_ros.descriptions import ComposableNode
 from launch.substitutions import LaunchConfiguration
@@ -28,16 +29,32 @@ from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 
 def generate_launch_description():
     # Launch arguments
+    use_keepout_arg = DeclareLaunchArgument(
+        'use_keepout',
+        default_value = 'False',
+        description = 'Use glim to capture pointcloud'
+    )
+
     map_yaml_launch_arg = DeclareLaunchArgument(
         'map_yaml_path',
         default_value=os.path.join(
-            get_package_share_directory('isaac_ros_occupancy_grid_localizer'), 'maps', 'kart_test.yaml'),
+            get_package_share_directory(
+                'nav_launch'), 'maps', 'map.yaml'),
         description='Full path to map yaml file'
     )
+
+    keepout_yaml_path = DeclareLaunchArgument(
+        'keepout_yaml_path',
+        default_value=os.path.join(
+            get_package_share_directory(
+                'nav_launch'), 'keepout', 'keepout_mask.yaml'),
+        description='Full path to keepout_mask yaml file'
+    )
+
     params_file_arg = DeclareLaunchArgument(
         'nav2_param_file', default_value=os.path.join(
             get_package_share_directory(
-                'nav_launch'),  'nav2_params.yaml'),
+                'nav_launch'), 'config', 'nav2_params_offline.yaml'),
         description='Full path to param file to load')
 
     nav2_bringup_launch_dir = os.path.join(
@@ -50,8 +67,30 @@ def generate_launch_description():
         launch_arguments={
             'map': LaunchConfiguration('map_yaml_path'),
             'use_sim_time': 'False',
-            'params_file': LaunchConfiguration('nav2_param_file')
+            'params_file': LaunchConfiguration('nav2_param_file'),
         }.items(),
+    )
+
+    pointcloud_to_laserscan_node = Node(
+        package='pointcloud_to_laserscan', 
+        executable='pointcloud_to_laserscan_node',
+        remappings=[('cloud_in', '/livox/lidar'),
+                    ('scan', '/scan')],
+        parameters=[{
+            'target_frame': 'livox_frame',
+            'transform_tolerance': 0.01,
+            'min_height': -1.0,
+            'max_height': 1.2, # 1.2 meter to not see top of doorframe
+            'angle_min': -3.14,  # -M_PI/2
+            'angle_max': 3.14,  # M_PI/2
+            'angle_increment': 0.0075,  # M_PI/360.0
+            'scan_time': 0.1,
+            'range_min': 0.1,
+            'range_max': 20.0,
+            'use_inf': False,
+            'inf_epsilon': 1.0,
+        }],
+        name='pointcloud_to_laserscan',
     )
 
     # Launch laserscan to flatscan
@@ -88,6 +127,49 @@ def generate_launch_description():
         output='screen'
     )
 
+    keepout_filter_mask_server = Node(
+       package='nav2_map_server',
+        executable='map_server',
+        name='filter_mask_server',
+        output='screen',
+        parameters=[{
+            'yaml_filename': LaunchConfiguration('keepout_yaml_path'),
+            'topic_name': '/keepout_filter_mask',
+            'frame_id': 'map',
+            'use_sim_time': False
+        }],
+        condition = IfCondition(LaunchConfiguration('use_keepout')),
+    )
+
+    keepout_filter_info_server = Node(
+        package='nav2_map_server',
+        executable='costmap_filter_info_server',
+        name='costmap_filter_info_server',
+        output='screen',
+        parameters=[{
+            'filter_info_topic': '/costmap_filter_info',
+            'mask_topic': '/keepout_filter_mask',
+            'type': 0,  # type 0 = keepout
+            'base': 0.0,
+            'multiplier': 1.0,
+            'use_sim_time': False
+        }],
+        condition = IfCondition(LaunchConfiguration('use_keepout')),
+    )
+
+    keepout_filter_lifecycle = Node(
+        package='nav2_lifecycle_manager',
+        executable='lifecycle_manager',
+        name='lifecycle_manager_costmap_filters',
+        output='screen',
+        parameters=[{
+            'use_sim_time': False,
+            'autostart': True,
+            'node_names': ['filter_mask_server', 'costmap_filter_info_server']
+        }],
+        condition = IfCondition(LaunchConfiguration('use_keepout')),
+    )
+
     # Publish base_frame to body 
 #    baselink_body_publisher = Node(
 #        package='tf2_ros', executable='static_transform_publisher',
@@ -97,12 +179,20 @@ def generate_launch_description():
 #    )
 
     # Create the launch description and populate
-    ld = LaunchDescription([map_yaml_launch_arg,])
+    ld = LaunchDescription()
 
     # Add the actions to launch all of the localiztion nodes
+    ld.add_action(use_keepout_arg)
+    ld.add_action(map_yaml_launch_arg)
+    ld.add_action(keepout_yaml_path)
     ld.add_action(params_file_arg)
+    ld.add_action(pointcloud_to_laserscan_node)
     ld.add_action(nav2_launch)
     ld.add_action(occupancy_grid_localizer_container)
+    ld.add_action(keepout_filter_mask_server)
+    ld.add_action(keepout_filter_info_server)
+    ld.add_action(keepout_filter_lifecycle)
+
 #    ld.add_action(baselink_body_publisher)
 
     return ld
