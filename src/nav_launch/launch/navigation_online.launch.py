@@ -112,6 +112,6 @@ def generate_launch_description():
     ld.add_action(pointcloud_to_laserscan_node)
     ld.add_action(glim_node)
     ld.add_action(slam_toolbox_launch)
-    ld.add_action(nav2_launch)
+#    ld.add_action(nav2_launch)
 
     return ld
