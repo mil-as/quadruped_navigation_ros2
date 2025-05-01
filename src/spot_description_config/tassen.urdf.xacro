@@ -51,6 +51,25 @@
           </geometry>
         </visual>
       </link>
+      
+      <joint name="${tf_prefix}Spotpack" type="fixed">
+        <parent link="${tf_prefix}tassen"/>
+        <child link="${tf_prefix}SpotPack"/>
+        <origin xyz="-0.2425 0 0" rpy="0 0 0"/>
+      </joint>
+
+      <link name="${tf_prefix}SpotPack">
+        <visual>
+          <geometry>
+            <mesh filename="package://spot_description/meshes/SpotPack/SpotPack.obj" scale="0.01 0.01 0.01"/>
+          </geometry>
+        </visual>
+        <collision>
+          <geometry>
+            <mesh filename="package://spot_description/meshes/SpotPack/SpotPackCollision.obj" scale="0.01 0.01 0.01"/>
+          </geometry>
+        </collision>
+      </link>
 
       <joint name="${tf_prefix}lidar_frame" type="fixed">
         <parent link="${tf_prefix}livox_lidar"/>
@@ -67,7 +86,7 @@
       </joint>
 
       <link name="zed_camera_link"/>
-
+      
     </xacro:if>
   </xacro:macro>
 </robot>
