@@ -63,8 +63,9 @@ if [ -d "spot_ros2" ]; then
     cp -r spot_description_config/tassen spot_ros2/spot_description/spot_description/meshes
     cp -r spot_description_config/LIVOX spot_ros2/spot_description/spot_description/meshes
     cp -r spot_description_config/ZED spot_ros2/spot_description/spot_description/meshes
-    cp -r spot_description_config/tassen.urdf.xacro spot_ros2/spot_description/spot_description/urdf
+    cp -r spot_description_config/SpotPack spot_ros2/spot_description/spot_description/meshes
     # Replace the spot_macro file to modify it to accept tassen
+    cp -r spot_description_config/tassen.urdf.xacro spot_ros2/spot_description/spot_description/urdf
     cp spot_description_config/spot_macro.xacro spot_ros2/spot_description/spot_description/urdf/spot_macro.xacro
 fi
 
