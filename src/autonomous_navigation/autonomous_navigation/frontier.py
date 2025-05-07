@@ -11,10 +11,10 @@ from rclpy.action import ActionClient
 from math import sqrt
 import numpy as np
 
-MIN_FRONTIER_LENGTH = 30
+MIN_FRONTIER_LENGTH = 22
 GOAL_TOLERANCE = 1
 INITIAL_SEARCH_DURATION = 10
-STATIC_POSITION_TIMER = 20
+STATIC_POSITION_TIMER = 30
 
 class FrontierExplorerNode(Node):
     def __init__(self):
