@@ -36,7 +36,7 @@ def generate_launch_description():
     )
 
     map_yaml_launch_arg = DeclareLaunchArgument(
-        'map_yaml_path',
+        'map_yaml',
         default_value=os.path.join(
             get_package_share_directory(
                 'nav_launch'), 'maps', 'map.yaml'),
@@ -44,15 +44,15 @@ def generate_launch_description():
     )
 
     keepout_yaml_path = DeclareLaunchArgument(
-        'keepout_yaml_path',
+        'keepout_yaml',
         default_value=os.path.join(
             get_package_share_directory(
                 'nav_launch'), 'keepout', 'keepout_mask.yaml'),
         description='Full path to keepout_mask yaml file'
     )
 
-    params_file_arg = DeclareLaunchArgument(
-        'nav2_param_file', default_value=os.path.join(
+    nav2_params_file_arg = DeclareLaunchArgument(
+        'nav2_params', default_value=os.path.join(
             get_package_share_directory(
                 'nav_launch'), 'config', 'nav2_params_offline.yaml'),
         description='Full path to param file to load')
@@ -65,9 +65,9 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(nav2_bringup_launch_dir, 'bringup_launch.py')),
         launch_arguments={
-            'map': LaunchConfiguration('map_yaml_path'),
+            'map': LaunchConfiguration('map_yaml'),
             'use_sim_time': 'False',
-            'params_file': LaunchConfiguration('nav2_param_file'),
+            'params_file': LaunchConfiguration('nav2_params'),
         }.items(),
     )
 
@@ -107,9 +107,9 @@ def generate_launch_description():
         package='isaac_ros_occupancy_grid_localizer',
         plugin='nvidia::isaac_ros::occupancy_grid_localizer::OccupancyGridLocalizerNode',
         name='occupancy_grid_localizer',
-        parameters=[LaunchConfiguration('map_yaml_path'), {
+        parameters=[LaunchConfiguration('map_yaml'), {
             'loc_result_frame': 'map',
-            'map_yaml_path': LaunchConfiguration('map_yaml_path'),
+            'map_yaml_path': LaunchConfiguration('map_yaml'),
         }],
         remappings=[('localization_result', '/initialpose')]
     )
@@ -133,7 +133,7 @@ def generate_launch_description():
         name='filter_mask_server',
         output='screen',
         parameters=[{
-            'yaml_filename': LaunchConfiguration('keepout_yaml_path'),
+            'yaml_filename': LaunchConfiguration('keepout_yaml'),
             'topic_name': '/keepout_filter_mask',
             'frame_id': 'map',
             'use_sim_time': False
@@ -185,7 +185,7 @@ def generate_launch_description():
     ld.add_action(use_keepout_arg)
     ld.add_action(map_yaml_launch_arg)
     ld.add_action(keepout_yaml_path)
-    ld.add_action(params_file_arg)
+    ld.add_action(nav2_params_file_arg)
     ld.add_action(pointcloud_to_laserscan_node)
     ld.add_action(nav2_launch)
     ld.add_action(occupancy_grid_localizer_container)
