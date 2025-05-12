@@ -1,5 +1,8 @@
 #! /usr/bin/env python
 
+#Ispiration taken from AniArka from github. 
+# URL: https://github.com/AniArka/Autonomous-Explorer-and-Mapper-ros2-nav2
+
 import rclpy
 from rclpy.node import Node
 
