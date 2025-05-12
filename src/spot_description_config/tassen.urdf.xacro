@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Argumenter -->
+  <xacro:macro name="use_tassen" params="tf_prefix">
+    <xacro:if value="$(optenv TASSEN 1)">
+    
+      <joint name="${tf_prefix}tassen_joint" type="fixed">
+        <parent link="${tf_prefix}front_rail"/>
+        <child link="${tf_prefix}tassen"/>
+        <origin xyz="-0.035 0 0" rpy="0 0 0"/>
+      </joint>
+
+      <link name="${tf_prefix}tassen">
+        <visual>
+          <geometry>
+            <mesh filename="package://spot_description/meshes/tassen/Tassen.obj" scale="0.01 0.01 0.01"/>
+          </geometry>
+        </visual>
+        <collision>
+          <geometry>
+            <mesh filename="package://spot_description/meshes/tassen/TassenProtect.obj" scale="0.01 0.01 0.01"/>
+          </geometry>
+        </collision>
+      </link>
+      
+      <joint name="${tf_prefix}zed_mount_joint" type="fixed">
+        <parent link="${tf_prefix}tassen"/>
+        <child link="${tf_prefix}zed_camera"/>
+        <origin xyz="0.06175 0 0.08525" rpy="0 0 0"/>
+      </joint>
+
+      <link name="${tf_prefix}zed_camera">
+        <visual>
+          <geometry>
+            <mesh filename="package://spot_description/meshes/ZED/ZED.obj" scale="0.01 0.01 0.01"/>
+          </geometry>
+        </visual>
+      </link>
+      
+      <joint name="${tf_prefix}livox_mount_joint" type="fixed">
+        <parent link="${tf_prefix}tassen"/>
+        <child link="${tf_prefix}livox_lidar"/>
+        <origin xyz="0 0 0.11925" rpy="0 0 0"/>
+      </joint>
+
+      <link name="${tf_prefix}livox_lidar">
+        <visual>
+          <geometry>
+            <mesh filename="package://spot_description/meshes/LIVOX/LIVOX.obj" scale="0.01 0.01 0.01"/>
+          </geometry>
+        </visual>
+      </link>
+      
+      <joint name="${tf_prefix}Spotpack" type="fixed">
+        <parent link="${tf_prefix}tassen"/>
+        <child link="${tf_prefix}SpotPack"/>
+        <origin xyz="-0.2425 0 0" rpy="0 0 0"/>
+      </joint>
+
+      <link name="${tf_prefix}SpotPack">
+        <visual>
+          <geometry>
+            <mesh filename="package://spot_description/meshes/SpotPack/SpotPack.obj" scale="0.01 0.01 0.01"/>
+          </geometry>
+        </visual>
+        <collision>
+          <geometry>
+            <mesh filename="package://spot_description/meshes/SpotPack/SpotPackCollision.obj" scale="0.01 0.01 0.01"/>
+          </geometry>
+        </collision>
+      </link>
+
+      <joint name="${tf_prefix}lidar_frame" type="fixed">
+        <parent link="${tf_prefix}livox_lidar"/>
+        <child link="livox_frame"/>
+        <origin xyz="0 0 0.047" rpy="0 0 0"/>
+      </joint>
+
+      <link name="livox_frame"/>
+
+      <joint name="${tf_prefix}zed_camera" type="fixed">
+        <parent link="${tf_prefix}zed_camera"/>
+        <child link="zed_camera_link"/>
+        <origin xyz="0 0 0.01" rpy="0 0 0"/>
+      </joint>
+
+      <link name="zed_camera_link"/>
+      
+    </xacro:if>
+  </xacro:macro>
+</robot>
