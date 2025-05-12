@@ -14,5 +14,5 @@ sudo apt install -y libiridescence-dev ros-humble-glim-ros-cuda12.5
 sudo ldconfig
 
 # Isaac ROS Map Localization
-rosdep update
-rosdep install --from-paths src/isaac_ros_map_localization/isaac_ros_occupancy_grid_localizer --ignore-src -y
+sudo apt-get update
+sudo apt-get install -y ros-humble-isaac-ros-occupancy-grid-localizer
