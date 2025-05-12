@@ -6,6 +6,7 @@ FROM ${BASE_IMAGE}
 # RUN ln -s /opt/hpcx/ompi /opt/hpcx/ompi/lib/x86_64-linux-gnu/openmpi
 
 # Installs packages
+RUN apt-get update
 RUN apt-get install -y ros-humble-pcl-conversions \
     && apt-get install -y ros-humble-rmw-zenoh-cpp
 
