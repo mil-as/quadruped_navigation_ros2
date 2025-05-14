@@ -1,4 +1,4 @@
-# inspector-spot
+# ROS2 Driven Navigation and Sensor Platform for Quadruped Robots
 
 BSc 2025 Project
 
