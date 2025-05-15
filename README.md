@@ -15,10 +15,6 @@ To set up the Nvidia Jetson follow this official guide:
 
 https://nvidia-isaac-ros.github.io/getting_started/hardware_setup/compute/index.html#jetson-platforms
 
-Then set up VPI for Jetson:
-
-https://nvidia-isaac-ros.github.io/getting_started/hardware_setup/compute/jetson_vpi.html
-
 ### x86_64 Hardware Setup
 
 To set up an x86_64 follow this official guide:
