@@ -1,0 +1,1409 @@
+{
+  "configById": {
+    "Plot!1ccyqd5": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/status/battery_states.battery_states[0].voltage",
+          "enabled": true,
+          "color": "#4e98e2",
+          "lineSize": 2,
+          "label": "Battery voltage"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": 35,
+      "maxYValue": 59,
+      "followingViewWidth": 60,
+      "xAxisLabel": "Time [sek]",
+      "yAxisLabel": "Voltage [V]",
+      "foxglovePanelTitle": "Battery voltage"
+    },
+    "Plot!p9pyw7": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/status/battery_states.battery_states[0].current",
+          "enabled": true,
+          "color": "#f0b511",
+          "lineSize": 2,
+          "label": "Battery current"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "followingViewWidth": 60,
+      "xAxisLabel": "Time [sek]",
+      "yAxisLabel": "Current [A]",
+      "foxglovePanelTitle": "Battery current"
+    },
+    "Plot!2w18xe8": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/status/battery_states.battery_states[0].charge_percentage",
+          "enabled": true,
+          "color": "#ef1111",
+          "lineSize": 2,
+          "label": "Battery charge"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "minYValue": 0,
+      "maxYValue": 100,
+      "followingViewWidth": 60,
+      "xAxisLabel": "Time [sek]",
+      "yAxisLabel": "Battery charge [%]",
+      "foxglovePanelTitle": "Battery charge"
+    },
+    "Plot!41abw6d": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/status/battery_states.battery_states[0].temperatures[:]",
+          "enabled": true,
+          "color": "#29f011",
+          "lineSize": 2,
+          "label": "Battery temperature"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "followingViewWidth": 60,
+      "xAxisLabel": "Time [sek]",
+      "yAxisLabel": "Battery temperature [C]",
+      "foxglovePanelTitle": "Battery temperature"
+    },
+    "Plot!1jckrgj": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/status/battery_states.battery_states[0].estimated_runtime.sec",
+          "enabled": true,
+          "color": "#4e98e2",
+          "label": "Battery estimated runtime [sek]"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "followingViewWidth": 60,
+      "foxglovePanelTitle": "Battery estimated runtime"
+    },
+    "Tab!3y1erzp": {
+      "activeTabIdx": 0,
+      "tabs": [
+        {
+          "title": "cmd_vel",
+          "layout": {
+            "first": "Plot!rq0x4o",
+            "second": "Plot!4jvxf79",
+            "direction": "column",
+            "splitPercentage": 49.52681388012618
+          }
+        },
+        {
+          "title": "State",
+          "layout": "StateTransitions!1c43u3e"
+        },
+        {
+          "title": "Log",
+          "layout": "RosOut!v7l1et"
+        },
+        {
+          "title": "Diagnostics",
+          "layout": "DiagnosticSummary!1gspt3l"
+        }
+      ]
+    },
+    "Plot!rq0x4o": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/cmd_vel.linear.x",
+          "enabled": true,
+          "color": "#4e98e2",
+          "showLine": true,
+          "label": "Linear x",
+          "lineSize": 2
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "followingViewWidth": 30,
+      "foxglovePanelTitle": "Linear x"
+    },
+    "Plot!4jvxf79": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/cmd_vel.angular.z",
+          "enabled": true,
+          "color": "#f7df71",
+          "label": "Angular z",
+          "lineSize": 2
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": true,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "followingViewWidth": 30,
+      "foxglovePanelTitle": "Angular z"
+    },
+    "StateTransitions!1c43u3e": {
+      "paths": [
+        {
+          "value": "/status/power_states.shore_power_state",
+          "timestampMethod": "receiveTime",
+          "label": "Shore power"
+        },
+        {
+          "value": "/status/power_states.motor_power_state",
+          "timestampMethod": "receiveTime",
+          "label": "Motor power"
+        },
+        {
+          "value": "/status/power_states.locomotion_charge_percentage",
+          "timestampMethod": "receiveTime",
+          "label": "Charge [%]"
+        },
+        {
+          "value": "/status/battery_states.battery_states[0].status",
+          "timestampMethod": "receiveTime",
+          "label": "Battery state"
+        }
+      ],
+      "isSynced": true,
+      "showPoints": false,
+      "xAxisRange": 600
+    },
+    "RosOut!v7l1et": {
+      "searchTerms": [],
+      "minLogLevel": 1,
+      "nameFilter": {
+        "robot_state_publisher": {
+          "visible": false
+        },
+        "container": {
+          "visible": false
+        },
+        "foxglove_bridge": {
+          "visible": false
+        },
+        "foxglove_bridge_component_manager": {
+          "visible": false
+        },
+        "slam_toolbox": {
+          "visible": false
+        },
+        "zed.zed_node": {
+          "visible": false
+        },
+        "pointcloud_to_laserscan": {
+          "visible": false
+        },
+        "smoother_server": {
+          "visible": false
+        },
+        "waypoint_follower": {
+          "visible": false
+        },
+        "planner_server": {
+          "visible": true
+        },
+        "global_costmap.global_costmap": {
+          "visible": false
+        },
+        "behavior_server": {
+          "visible": false
+        },
+        "bt_navigator": {
+          "visible": false
+        },
+        "velocity_smoother": {
+          "visible": false
+        },
+        "lifecycle_manager_navigation": {
+          "visible": false
+        },
+        "controller_server": {
+          "visible": false
+        },
+        "local_costmap.local_costmap": {
+          "visible": false
+        },
+        "explorer": {
+          "visible": true
+        },
+        "bt_navigator_navigate_to_pose_rclcpp_node": {
+          "visible": false
+        },
+        "image_publisher": {
+          "visible": false
+        },
+        "register_node_right": {
+          "visible": false
+        },
+        "zed.zed_container": {
+          "visible": false
+        },
+        "register_node_back": {
+          "visible": false
+        },
+        "livox_lidar_publisher": {
+          "visible": false
+        }
+      },
+      "fontSize": 12
+    },
+    "DiagnosticSummary!1gspt3l": {
+      "minLevel": 0,
+      "pinnedIds": [],
+      "hardwareIdFilter": "",
+      "topicToRender": "/diagnostics",
+      "sortByLevel": true
+    },
+    "Image!10ujn2a": {
+      "cameraState": {
+        "distance": 20,
+        "perspective": true,
+        "phi": 60,
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOffset": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "thetaOffset": 45,
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "scene": {
+        "enableStats": false
+      },
+      "transforms": {},
+      "topics": {},
+      "layers": {},
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {
+        "imageTopic": "/camera/left/image",
+        "calibrationTopic": "/camera/left/camera_info",
+        "synchronize": false,
+        "flipHorizontal": false,
+        "colorMode": "gradient"
+      },
+      "foxglovePanelTitle": "Left"
+    },
+    "Image!ymdmt6": {
+      "cameraState": {
+        "distance": 20,
+        "perspective": true,
+        "phi": 60,
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOffset": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "thetaOffset": 45,
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "scene": {},
+      "transforms": {},
+      "topics": {},
+      "layers": {},
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {
+        "imageTopic": "/camera/frontleft/image",
+        "calibrationTopic": "/camera/frontleft/camera_info",
+        "rotation": 90
+      },
+      "foxglovePanelTitle": "Front left"
+    },
+    "Image!hh5vqc": {
+      "cameraState": {
+        "distance": 20,
+        "perspective": true,
+        "phi": 60,
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOffset": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "thetaOffset": 45,
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "scene": {},
+      "transforms": {},
+      "topics": {},
+      "layers": {},
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {
+        "imageTopic": "/camera/frontright/image",
+        "calibrationTopic": "/camera/frontright/camera_info",
+        "rotation": 90
+      },
+      "foxglovePanelTitle": "Front right"
+    },
+    "Image!44sr83f": {
+      "cameraState": {
+        "distance": 20,
+        "perspective": true,
+        "phi": 60,
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOffset": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "thetaOffset": 45,
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "scene": {},
+      "transforms": {},
+      "topics": {},
+      "layers": {},
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {
+        "imageTopic": "/camera/back/image",
+        "calibrationTopic": "/camera/back/camera_info"
+      }
+    },
+    "Image!ji13oc": {
+      "cameraState": {
+        "distance": 20,
+        "perspective": true,
+        "phi": 60,
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOffset": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "thetaOffset": 45,
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "scene": {},
+      "transforms": {},
+      "topics": {},
+      "layers": {},
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {
+        "imageTopic": "/camera/right/image",
+        "calibrationTopic": "/camera/right/camera_info",
+        "rotation": 180
+      },
+      "foxglovePanelTitle": "Right"
+    },
+    "CallService!44ttnsv": {
+      "requestPayload": "{}",
+      "layout": "vertical",
+      "timeoutSeconds": 10,
+      "serviceName": "/claim",
+      "buttonText": "Claim",
+      "foxglovePanelTitle": "Claim Spot",
+      "editingMode": false
+    },
+    "CallService!2cjn65u": {
+      "requestPayload": "{}",
+      "layout": "vertical",
+      "timeoutSeconds": 10,
+      "serviceName": "/power_on",
+      "buttonText": "Power motor on",
+      "foxglovePanelTitle": "Power on motors",
+      "editingMode": false
+    },
+    "CallService!wdazyd": {
+      "requestPayload": "{}",
+      "layout": "vertical",
+      "timeoutSeconds": 10,
+      "serviceName": "/stand",
+      "buttonText": "Stand",
+      "foxglovePanelTitle": "Make Spot stand",
+      "editingMode": false
+    },
+    "CallService!13u4hyg": {
+      "requestPayload": "{}",
+      "layout": "vertical",
+      "timeoutSeconds": 10,
+      "serviceName": "/release",
+      "buttonText": "Release",
+      "foxglovePanelTitle": "Release Spot",
+      "editingMode": false
+    },
+    "CallService!3dzeyil": {
+      "requestPayload": "{}",
+      "layout": "vertical",
+      "timeoutSeconds": 10,
+      "serviceName": "/power_off",
+      "buttonText": "Power motor off",
+      "foxglovePanelTitle": "Power off motors",
+      "editingMode": false
+    },
+    "CallService!383pu5k": {
+      "requestPayload": "{}",
+      "layout": "vertical",
+      "timeoutSeconds": 10,
+      "serviceName": "/sit",
+      "buttonText": "Sit",
+      "foxglovePanelTitle": "Make Spot sit",
+      "editingMode": false
+    },
+    "CallService!2w1mimk": {
+      "requestPayload": "{}",
+      "layout": "vertical",
+      "timeoutSeconds": 10,
+      "serviceName": "/trigger_grid_search_localization",
+      "editingMode": false,
+      "foxglovePanelTitle": "Place robot on map",
+      "buttonText": "Place on map"
+    },
+    "CallService!10vgppv": {
+      "requestPayload": "{}",
+      "layout": "vertical",
+      "timeoutSeconds": 10,
+      "serviceName": "/estop/gentle",
+      "buttonText": "Estop gentle",
+      "buttonTooltip": "Estop gentle",
+      "buttonColor": "#ff0000",
+      "foxglovePanelTitle": "Estop hard",
+      "editingMode": false
+    },
+    "CallService!2oamqd0": {
+      "requestPayload": "{}",
+      "layout": "vertical",
+      "timeoutSeconds": 10,
+      "serviceName": "/estop/hard",
+      "buttonText": "Estop hard",
+      "buttonTooltip": "Estop hard",
+      "buttonColor": "#ff0000",
+      "foxglovePanelTitle": "Estop hard",
+      "editingMode": false
+    },
+    "3D!18i6zy7": {
+      "layers": {
+        "845139cb-26bc-40b3-8161-8ab60af4baf5": {
+          "visible": false,
+          "frameLocked": true,
+          "label": "Grid",
+          "instanceId": "845139cb-26bc-40b3-8161-8ab60af4baf5",
+          "layerId": "foxglove.Grid",
+          "size": 10,
+          "divisions": 10,
+          "lineWidth": 1,
+          "color": "#248eff",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ],
+          "order": 1
+        },
+        "d79914fa-9959-47ac-94a4-65ad0e3f6344": {
+          "displayMode": "visual",
+          "fallbackColor": "#fbd403",
+          "showAxis": false,
+          "axisScale": 1,
+          "visible": true,
+          "frameLocked": true,
+          "instanceId": "d79914fa-9959-47ac-94a4-65ad0e3f6344",
+          "label": "Spot",
+          "layerId": "foxglove.Urdf",
+          "sourceType": "topic",
+          "url": "",
+          "filePath": "/home/erlend/workspaces/isaac_ros-dev/spot.urdf",
+          "parameter": "",
+          "topic": "/robot_description",
+          "framePrefix": "",
+          "order": 2
+        }
+      },
+      "cameraState": {
+        "distance": 20,
+        "perspective": true,
+        "phi": 29.07981189955198,
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOffset": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "thetaOffset": 162.50656755691526,
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-none",
+      "scene": {
+        "transforms": {
+          "editable": false,
+          "showLabel": false,
+          "enablePreloading": false
+        },
+        "meshUpAxis": "z_up",
+        "enableStats": true
+      },
+      "transforms": {
+        "frame:body": {
+          "visible": true
+        },
+        "frame:base_link": {
+          "visible": true
+        },
+        "frame:front_left_hip": {
+          "visible": false
+        },
+        "frame:front_left_upper_leg": {
+          "visible": false
+        },
+        "frame:front_left_lower_leg": {
+          "visible": false
+        },
+        "frame:front_rail": {
+          "visible": false
+        },
+        "frame:front_right_hip": {
+          "visible": false
+        },
+        "frame:front_right_upper_leg": {
+          "visible": false
+        },
+        "frame:front_right_lower_leg": {
+          "visible": false
+        },
+        "frame:rear_left_hip": {
+          "visible": false
+        },
+        "frame:rear_left_upper_leg": {
+          "visible": false
+        },
+        "frame:rear_left_lower_leg": {
+          "visible": false
+        },
+        "frame:rear_rail": {
+          "visible": false
+        },
+        "frame:rear_right_hip": {
+          "visible": false
+        },
+        "frame:rear_right_upper_leg": {
+          "visible": false
+        },
+        "frame:rear_right_lower_leg": {
+          "visible": false
+        },
+        "frame:map": {
+          "visible": true
+        },
+        "frame:odom": {
+          "visible": true
+        },
+        "frame:feet_center": {
+          "visible": true
+        },
+        "frame:flat_body": {
+          "visible": false
+        },
+        "frame:head": {
+          "visible": false
+        },
+        "frame:back": {
+          "visible": false
+        },
+        "frame:back_fisheye": {
+          "visible": false
+        },
+        "frame:frontleft_fisheye": {
+          "visible": false
+        },
+        "frame:frontright": {
+          "visible": false
+        },
+        "frame:frontright_fisheye": {
+          "visible": false
+        },
+        "frame:left": {
+          "visible": false
+        },
+        "frame:left_fisheye": {
+          "visible": false
+        },
+        "frame:vision": {
+          "visible": false
+        },
+        "frame:odom_glim": {
+          "visible": true
+        },
+        "frame:gpe": {
+          "visible": false
+        },
+        "frame:zed_camera_link": {
+          "visible": false
+        },
+        "frame:zed_camera_center": {
+          "visible": false
+        },
+        "frame:zed_left_camera_frame": {
+          "visible": false
+        },
+        "frame:zed_left_camera_optical_frame": {
+          "visible": false
+        },
+        "frame:zed_right_camera_frame": {
+          "visible": false
+        },
+        "frame:zed_right_camera_optical_frame": {
+          "visible": false
+        },
+        "frame:tassen": {
+          "visible": false
+        },
+        "frame:livox_lidar": {
+          "visible": false
+        },
+        "frame:livox_frame": {
+          "visible": true
+        },
+        "frame:zed_camera": {
+          "visible": false
+        },
+        "frame:frontleft": {
+          "visible": false
+        },
+        "frame:right": {
+          "visible": false
+        },
+        "frame:right_fisheye": {
+          "visible": false
+        },
+        "frame:filtered_fiducial_4": {
+          "visible": false
+        },
+        "frame:filtered_fiducial_5": {
+          "visible": false
+        },
+        "frame:fiducial_4": {
+          "visible": false
+        },
+        "frame:fiducial_5": {
+          "visible": false
+        },
+        "frame:zed_imu_link": {
+          "visible": false
+        },
+        "frame:fiducial_469": {
+          "visible": false
+        },
+        "frame:filtered_fiducial_469": {
+          "visible": false
+        },
+        "frame:initial_pose": {
+          "visible": true
+        },
+        "frame:lidar_frame": {
+          "visible": true
+        }
+      },
+      "topics": {
+        "/livox/lidar": {
+          "visible": false,
+          "colorField": "_auto_distance",
+          "colorMode": "colormap",
+          "colorMap": "turbo",
+          "pointShape": "circle",
+          "decayTime": 0,
+          "maxValue": 5,
+          "pointSize": 5
+        },
+        "/initialpose": {
+          "visible": true,
+          "type": "axis",
+          "axisScale": 0.5
+        },
+        "/move_base_simple/goal": {
+          "visible": false
+        },
+        "/robot_description": {
+          "visible": false,
+          "showAxis": false,
+          "displayMode": "visual",
+          "links": {
+            "body": {
+              "visible": true
+            },
+            "rear_right_lower_leg": {
+              "visible": true
+            }
+          }
+        },
+        "/goal_pose": {
+          "visible": false,
+          "type": "axis",
+          "axisScale": 0.5
+        },
+        "/pointcloud/nitros": {
+          "visible": false,
+          "colorField": "intensity",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/pointcloud": {
+          "visible": true,
+          "colorField": "_auto_distance",
+          "colorMode": "colormap",
+          "colorMap": "turbo",
+          "decayTime": 0,
+          "stixelsEnabled": false,
+          "pointShape": "circle",
+          "pointSize": 2,
+          "maxValue": 6
+        },
+        "/scan": {
+          "visible": false,
+          "colorField": "intensity",
+          "colorMode": "flat",
+          "colorMap": "turbo",
+          "pointSize": 2.7,
+          "pointShape": "circle",
+          "decayTime": 0,
+          "flatColor": "#ffffffff"
+        },
+        "/localization_result": {
+          "visible": false,
+          "axisScale": 1
+        },
+        "/lio_sam/mapping/map_local": {
+          "visible": false
+        },
+        "/intensity_map": {
+          "visible": false
+        },
+        "/height_map": {
+          "visible": false
+        },
+        "/left/camera_info_rect": {
+          "visible": false
+        },
+        "/left/image_rect": {
+          "visible": false,
+          "frameLocked": true,
+          "cameraInfoTopic": "/left/camera_info_rect",
+          "distance": 1,
+          "planarProjectionFactor": 0,
+          "color": "#ffffff"
+        },
+        "/visual_slam/vis/observations_cloud": {
+          "visible": false
+        },
+        "/visual_slam/vis/loop_closure_cloud": {
+          "visible": false
+        },
+        "/visual_slam/vis/landmarks_cloud": {
+          "visible": false
+        },
+        "/right/image_rect": {
+          "visible": false
+        },
+        "/nvblox_node/back_projected_depth/zed_left_camera_optical_frame": {
+          "visible": false,
+          "colorField": "intensity",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/nvblox_node/static_esdf_pointcloud": {
+          "visible": false,
+          "colorField": "intensity",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/nvblox_node/static_occupancy": {
+          "visible": false
+        },
+        "/nvblox_node/pessimistic_static_esdf_pointcloud": {
+          "visible": false,
+          "colorField": "intensity",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/zed/zed_node/depth/camera_info": {
+          "visible": false
+        },
+        "/nvblox_node/shapes_to_clear": {
+          "visible": false
+        },
+        "/zed/zed_node/point_cloud/cloud_registered": {
+          "visible": false,
+          "colorField": "rgb",
+          "colorMode": "rgb",
+          "colorMap": "turbo"
+        },
+        "/camera/back/image": {
+          "visible": false,
+          "frameLocked": true,
+          "cameraInfoTopic": "/camera/back/camera_info",
+          "distance": 1,
+          "planarProjectionFactor": 0,
+          "color": "#ffffff"
+        },
+        "/camera/frontleft/image": {
+          "visible": false,
+          "frameLocked": true,
+          "cameraInfoTopic": "/camera/frontleft/camera_info",
+          "distance": 1,
+          "planarProjectionFactor": 0,
+          "color": "#ffffff"
+        },
+        "/camera/frontright/image": {
+          "visible": false,
+          "frameLocked": true,
+          "cameraInfoTopic": "/camera/frontright/camera_info",
+          "distance": 1,
+          "planarProjectionFactor": 0,
+          "color": "#ffffff"
+        },
+        "/camera/left/image": {
+          "visible": false,
+          "frameLocked": true,
+          "cameraInfoTopic": "/camera/left/camera_info",
+          "distance": 1,
+          "planarProjectionFactor": 0,
+          "color": "#ffffff"
+        },
+        "/camera/right/image": {
+          "visible": false,
+          "frameLocked": true,
+          "cameraInfoTopic": "/camera/right/camera_info",
+          "distance": 1,
+          "planarProjectionFactor": 0,
+          "color": "#ffffff"
+        },
+        "/map": {
+          "visible": true,
+          "colorMode": "custom"
+        },
+        "/depth/frontright/image": {
+          "visible": false
+        },
+        "/marker": {
+          "visible": false
+        },
+        "/plan": {
+          "visible": true,
+          "gradient": [
+            "#00ff00ff",
+            "#ff0000ff"
+          ],
+          "lineWidth": 0.1
+        },
+        "/cost_cloud": {
+          "visible": false
+        },
+        "/local_costmap/costmap": {
+          "visible": true,
+          "colorMode": "custom"
+        },
+        "/global_costmap/published_footprint": {
+          "visible": false
+        },
+        "/local_costmap/published_footprint": {
+          "visible": false,
+          "color": "#00ff00ff",
+          "lineWidth": 0.005
+        },
+        "/global_costmap/costmap": {
+          "visible": false
+        },
+        "/glim_ros/aligned_points": {
+          "visible": false,
+          "colorField": "_auto_distance",
+          "colorMode": "colormap",
+          "colorMap": "turbo",
+          "minValue": 0,
+          "maxValue": 20,
+          "decayTime": 0,
+          "pointSize": 2
+        },
+        "/local_costmap/voxel_grid": {
+          "visible": false,
+          "colorField": "_auto_distance",
+          "colorMode": "colormap",
+          "colorMap": "turbo",
+          "pointSize": 5,
+          "pointShape": "square",
+          "minValue": 0,
+          "maxValue": 5
+        },
+        "/image": {
+          "visible": false
+        },
+        "/zed/zed_node/rgb/image_rect_color/compressed": {
+          "visible": false
+        },
+        "/zed/zed_node/rgb/camera_info": {
+          "visible": false
+        },
+        "/local_plan": {
+          "visible": false
+        },
+        "/plan_smoothed": {
+          "visible": false,
+          "type": "line",
+          "gradient": [
+            "#ff0000ff",
+            "#ff0000ff"
+          ]
+        },
+        "/received_global_plan": {
+          "visible": true,
+          "gradient": [
+            "#2cff00ff",
+            "#2cff00ff"
+          ]
+        },
+        "/transformed_global_plan": {
+          "visible": false,
+          "gradient": [
+            "#00ff00ff",
+            "#00ff00ff"
+          ],
+          "lineWidth": 0.1
+        },
+        "/zed/zed_node/path_map": {
+          "visible": false
+        },
+        "/zed/zed_node/path_odom": {
+          "visible": false
+        },
+        "/camera/back/camera_info": {
+          "visible": false
+        },
+        "/camera/frontleft/camera_info": {
+          "visible": false
+        },
+        "/camera/frontright/camera_info": {
+          "visible": false
+        },
+        "/camera/left/camera_info": {
+          "visible": false
+        },
+        "/camera/right/camera_info": {
+          "visible": false
+        },
+        "/depth/back/image": {
+          "visible": false
+        },
+        "/lookahead_collision_arc": {
+          "visible": true
+        },
+        "/glim_ros/map": {
+          "visible": false
+        },
+        "/glim_ros/points": {
+          "visible": false,
+          "colorField": "z",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/glim_ros/pose": {
+          "visible": false
+        },
+        "/slam_toolbox/scan_visualization": {
+          "visible": false
+        },
+        "/slam_toolbox/graph_visualization": {
+          "visible": false,
+          "namespaces": {
+            "": {
+              "visible": true
+            },
+            "slam_toolbox": {
+              "visible": true
+            },
+            "slam_toolbox_edges": {
+              "visible": true
+            }
+          }
+        },
+        "/trajectories": {
+          "visible": false
+        },
+        "/pose": {
+          "visible": false
+        },
+        "/unsmoothed_plan": {
+          "visible": false
+        },
+        "/genz/local_map": {
+          "visible": false,
+          "colorField": "z",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/genz/non_planar_points": {
+          "visible": false,
+          "colorField": "z",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        },
+        "/genz/planar_points": {
+          "visible": false,
+          "colorField": "z",
+          "colorMode": "colormap",
+          "colorMap": "turbo"
+        }
+      },
+      "publish": {
+        "type": "pose",
+        "poseTopic": "/goal_pose",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {},
+      "followTf": "map"
+    },
+    "Tab!2i6thmy": {
+      "activeTabIdx": 0,
+      "tabs": [
+        {
+          "title": "Battery",
+          "layout": {
+            "first": "Plot!1ccyqd5",
+            "second": {
+              "first": {
+                "first": "Plot!p9pyw7",
+                "second": "Plot!2w18xe8",
+                "direction": "column"
+              },
+              "second": {
+                "first": "Plot!41abw6d",
+                "second": "Plot!1jckrgj",
+                "direction": "column",
+                "splitPercentage": 50.410958904109584
+              },
+              "direction": "column",
+              "splitPercentage": 54.20326223337515
+            },
+            "direction": "column",
+            "splitPercentage": 18.75637104994903
+          }
+        },
+        {
+          "title": "Data",
+          "layout": "Tab!3y1erzp"
+        },
+        {
+          "title": "Spot Camera",
+          "layout": {
+            "first": {
+              "first": "Image!10ujn2a",
+              "second": {
+                "first": {
+                  "first": "Image!ymdmt6",
+                  "second": "Image!hh5vqc",
+                  "direction": "row"
+                },
+                "second": "Image!44sr83f",
+                "direction": "column"
+              },
+              "direction": "row",
+              "splitPercentage": 41.578682090427016
+            },
+            "second": "Image!ji13oc",
+            "direction": "row",
+            "splitPercentage": 72.35087719298245
+          }
+        },
+        {
+          "title": "Service calls",
+          "layout": {
+            "first": {
+              "first": "CallService!44ttnsv",
+              "second": {
+                "first": "CallService!2cjn65u",
+                "second": "CallService!wdazyd",
+                "direction": "row"
+              },
+              "direction": "row",
+              "splitPercentage": 34.175438596491226
+            },
+            "second": {
+              "first": "CallService!13u4hyg",
+              "second": {
+                "first": "CallService!3dzeyil",
+                "second": "CallService!383pu5k",
+                "direction": "row"
+              },
+              "direction": "row",
+              "splitPercentage": 34.175438596491226
+            },
+            "direction": "column"
+          }
+        },
+        {
+          "title": "Offline map",
+          "layout": "CallService!2w1mimk"
+        },
+        {
+          "title": "Estop",
+          "layout": {
+            "first": "CallService!10vgppv",
+            "second": "CallService!2oamqd0",
+            "direction": "column"
+          }
+        }
+      ]
+    },
+    "CallService!11v43q6": {
+      "requestPayload": "{}",
+      "layout": "horizontal",
+      "timeoutSeconds": 10,
+      "serviceName": "/estop/gentle",
+      "buttonText": "Estop",
+      "buttonColor": "#ff0000",
+      "editingMode": false,
+      "buttonTooltip": "Gentle estop",
+      "foxglovePanelTitle": "Estop gentle"
+    },
+    "Indicator!2qce6e4": {
+      "path": "/status/estop.estop_states[0].state",
+      "style": "background",
+      "fontSize": 36,
+      "fallbackColor": "#00ff00",
+      "fallbackLabel": "HW estop off",
+      "rules": [
+        {
+          "operator": "=",
+          "rawValue": "1",
+          "color": "#ff0000",
+          "label": "HW estop on"
+        }
+      ],
+      "foxglovePanelTitle": "Hardware estop"
+    },
+    "Indicator!29zorjd": {
+      "path": "/status/leases.resources[2].lease_owner",
+      "style": "background",
+      "fontSize": 36,
+      "fallbackColor": "#00ff00",
+      "fallbackLabel": "SW estop off",
+      "rules": [
+        {
+          "operator": "=",
+          "rawValue": "1",
+          "color": "#ff0000",
+          "label": "SW estop on"
+        }
+      ],
+      "foxglovePanelTitle": "Software estop"
+    },
+    "Gauge!2kb0r9s": {
+      "path": "/status/battery_states.battery_states[0].charge_percentage",
+      "minValue": 0,
+      "maxValue": 100,
+      "colorMap": "red-yellow-green",
+      "colorMode": "colormap",
+      "gradient": [
+        "#0000ff",
+        "#ff00ff"
+      ],
+      "reverse": false,
+      "foxglovePanelTitle": "Spot battery percentage"
+    }
+  },
+  "globalVariables": {},
+  "userNodes": {},
+  "playbackConfig": {
+    "speed": 1
+  },
+  "layout": {
+    "first": {
+      "first": "3D!18i6zy7",
+      "second": "Tab!2i6thmy",
+      "direction": "row",
+      "splitPercentage": 61.149715729627296
+    },
+    "second": {
+      "first": {
+        "first": "CallService!11v43q6",
+        "second": {
+          "first": "Indicator!2qce6e4",
+          "second": "Indicator!29zorjd",
+          "direction": "column",
+          "splitPercentage": 49.71865708437298
+        },
+        "direction": "column",
+        "splitPercentage": 30.41018387553041
+      },
+      "second": "Gauge!2kb0r9s",
+      "direction": "column",
+      "splitPercentage": 69.93076162215628
+    },
+    "direction": "row",
+    "splitPercentage": 85.47516198704103
+  }
+}
