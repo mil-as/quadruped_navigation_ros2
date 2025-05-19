@@ -23,4 +23,6 @@ done
 
 cd ${ISAAC_ROS_WS} && \
 sudo apt update && \
-rosdep update && rosdep install --from-paths src/zed-ros2-wrapper --ignore-src -r -y 
+rosdep update && rosdep install --from-paths src/zed-ros2-wrapper --ignore-src -r -y
+
+cp common_stereo.yaml src/zed-ros2-wrapper/zed_wrapper/config
