@@ -2,13 +2,13 @@
 This repository contains the code for a ROS 2 driven navigation and sensor platform for quadruped robots.
 The project was a bachelor project in mechatronics from the Mechatronics Innovation Lab at the University of Agder in spring 2025.
 
-## Repository Contents:
+### Repository Contents:
 The repository contains documentation and code to control Boston Dynamics Spot from an NVIDIA Jetson AGX Orin running NVIDIA Isaac ROS.
 To get data from the environment, a Livox Mid360 3D LiDAR and a Stereolabs Zed 2i stereo RGBD camera are used.
 The navigation package used is Navigation 2 (Nav2) alongside SLAM_toolbox for map generation.
 A custom package has been developed for autonomous map-making using a frontier-driven approach.
 
-## Abstract from the Finished Paper:
+### Abstract from the Finished Paper:
 This thesis presents the development of a ROS 2 driven navigation and sensor platform for quadrupeds. The main goal is to develop a platform capable of autonomous navigation and navigating on a pre-made map for use in repeated inspections. To do this, the ROS 2 packages SLAM\_toolbox and Navigation2 are utilized to map and navigate. A custom autonomous exploration package is written for ROS 2 to determine where the robot should walk and explore. The system was tested at the lab and offices at MIL. The results show that it is able to find frontiers and navigate to them autonomously. In addition, pre-made maps can be loaded in and the robot is able to localize and orient itself. These findings demonstrates its ability to navigate autonomously in dynamic environments as well as using pre defined maps.
 
 ## Requirements
