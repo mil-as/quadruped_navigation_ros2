@@ -1,4 +1,4 @@
-# ROS2 Driven Navigation and Sensor Platform for Quadruped Robots
+# ROS 2 Driven Navigation and Sensor Platform for Quadruped Robots
 This repository contains the code for a ROS 2 driven navigation and sensor platform for quadruped robots.
 The project was a bachelor project in mechatronics from the Mechatronics Innovation Lab at the University of Agder in spring 2025.
 
