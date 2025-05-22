@@ -1,6 +1,6 @@
 # ROS 2 Driven Navigation and Sensor Platform for Quadruped Robots
 This repository contains the code for a ROS 2 driven navigation and sensor platform for quadruped robots.
-The project was a bachelor project in mechatronics from the Mechatronics Innovation Lab at the University of Agder in spring 2025.
+The project was a bachelor's project in mechatronics from the Mechatronics Innovation Lab at the University of Agder in spring 2025.
 
 ### Repository Contents:
 The repository contains documentation and code to control Boston Dynamics Spot from an NVIDIA Jetson AGX Orin running NVIDIA Isaac ROS.
@@ -9,7 +9,13 @@ The navigation package used is Navigation 2 (Nav2) alongside SLAM_toolbox for ma
 A custom package has been developed for autonomous map-making using a frontier-driven approach.
 
 ### Abstract from the Finished Paper:
-This thesis presents the development of a ROS 2 driven navigation and sensor platform for quadrupeds. The main goal is to develop a platform capable of autonomous navigation and navigating on a pre-made map for use in repeated inspections. To do this, the ROS 2 packages SLAM\_toolbox and Navigation2 are utilized to map and navigate. A custom autonomous exploration package is written for ROS 2 to determine where the robot should walk and explore. The system was tested at the lab and offices at MIL. The results show that it is able to find frontiers and navigate to them autonomously. In addition, pre-made maps can be loaded in and the robot is able to localize and orient itself. These findings demonstrates its ability to navigate autonomously in dynamic environments as well as using pre defined maps.
+This thesis presents the development of a ROS 2 driven navigation and sensor platform for quadrupeds.
+The main goal is to develop a platform capable of autonomous navigation and navigating on a pre-made map for use in repeated inspections.
+To do this, the ROS 2 packages *SLAM Toolbox* and *Navigation2* are utilised to map and navigate. A custom autonomous exploration package is written for ROS 2 to determine where the robot should walk and explore.
+The system was tested at the lab and offices at MIL.
+The results show that it is able to navigate autonomously.
+In addition, pre-made maps can be loaded in, where the robot can localise and orient itself.
+These findings demonstrate its ability to navigate autonomously in dynamic environments and use pre-defined maps.
 
 ## Requirements
 
@@ -233,7 +239,7 @@ ros2 launch nav_launch navigation_offline.launch.py
 | use_keepout     | False                                      |
 | keepout_yaml    | nav_launch/keepout/keepout_mask.yaml       |
 
-### Launch nodes separate:
+### Launch nodes separately:
 
 In terminal 1 run (Zenoh router):
 ```bash
