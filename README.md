@@ -281,6 +281,12 @@ In terminal 8 run (NAV2):
 ros2 launch nav2_bringup navigation_launch.py params_file:=/workspaces/isaac_ros-dev/src/nav_launch/config/nav2_params.yaml
 ```
 
+## Launch frontier explorer
+To start autonomous frontier exploration run:
+```bash
+ros2 run autonomous_navigation frontierexplorer.py
+```
+
 ## Foxglove
 To start the ROS "Foxglove bridge":
 ```bash
