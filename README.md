@@ -284,7 +284,7 @@ ros2 launch nav2_bringup navigation_launch.py params_file:=/workspaces/isaac_ros
 ## Launch frontier explorer
 To start autonomous frontier exploration run:
 ```bash
-ros2 run autonomous_navigation frontierexplorer.py
+ros2 run autonomous_navigation frontierExploration
 ```
 
 ## Foxglove
